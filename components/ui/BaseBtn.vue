@@ -12,7 +12,7 @@ const props = withDefaults(defineProps<BtnProps>(), {
 
 
 <template>
-  <button v-bind="$attrs" class="flex flex-row items-center gap-2">
+  <button v-bind="$attrs" class="flex flex-row items-center justify-center gap-2">
     <slot name="prependIcon"></slot>
     <span :class="textStyle">{{ labelText }}</span>
     <slot name="appendIcon"></slot>
