@@ -1,5 +1,5 @@
 import { fetchKeys } from "../types/enums";
-import type { AuthenticatedUser } from "../types/user";
+import type { AuthenticatedUser, FetchedAuthenticatedUser } from "../types/user";
 
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref(false);
@@ -13,7 +13,8 @@ export const useAuthStore = defineStore('auth', () => {
       throw new Error(error.value.message);
     }
     const userStore = useUserStore();
-    userStore.setUser(data.value as AuthenticatedUser);
+    userStore.setUser((data.value as FetchedAuthenticatedUser).user);
+    updateAuthState(true);
   }
 
   const updateAuthState = (state: boolean) => {
@@ -42,11 +43,26 @@ export const useAuthStore = defineStore('auth', () => {
     return navigateTo(`${backendUrl}/auth/google`, { external: true });
   }
 
+  const logout = async () => {
+    const { error } = await useApiFetch('/auth/logout', {
+      method: 'POST',
+      key: fetchKeys.Logout,
+    });
+    if (error.value) {
+      throw new Error(error.value.message);
+    }
+    const userStore = useUserStore();
+    updateAuthState(false);
+    userStore.setUser(null);
+    return navigateTo({ name: 'login' });
+  }
+
   return {
     fetchUser,
     updateAuthState,
     emailLogin,
     googleLogin,
     isAuthenticated,
+    logout,
   }
 });

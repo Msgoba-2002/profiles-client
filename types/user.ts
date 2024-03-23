@@ -7,3 +7,7 @@ export interface AuthenticatedUser {
   email_verified: boolean;
   questions_verified: boolean;
 }
+
+export interface FetchedAuthenticatedUser {
+  user: AuthenticatedUser;
+}

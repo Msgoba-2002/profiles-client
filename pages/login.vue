@@ -1,5 +1,9 @@
 <script setup lang="ts">
-const { googleLogin, emailLogin, isAuthenticated } = useAuthStore()
+definePageMeta({
+  middleware: ['guest-only'],
+});
+const { isAuthenticated } = storeToRefs(useAuthStore());
+const { googleLogin, emailLogin } = useAuthStore();
 const { user } = storeToRefs(useUserStore());
 
 const submitLoginForm = () => {
@@ -9,9 +13,9 @@ const handleLogin = async (body: { email: string; password: string; }) => {
   const { email, password } = body;
   await emailLogin(email, password);
 
-  if (isAuthenticated && user.value) {
+  if (isAuthenticated.value && user.value) {
     const { id } = user.value;
-    return navigateTo({ name: 'user-userId-dashboard', params: { userId: id } });
+    return navigateTo({ name: 'user-userId', params: { userId: id } });
   }
 }
 </script>

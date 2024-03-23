@@ -4,7 +4,7 @@ import type { AuthenticatedUser } from '@/types/user';
 export const useUserStore = defineStore('user', () => {
   const user = ref<AuthenticatedUser | null>(null);
 
-  const setUser = (newUser: AuthenticatedUser) => {
+  const setUser = (newUser: AuthenticatedUser | null) => {
     user.value = newUser;
   }
   return {
