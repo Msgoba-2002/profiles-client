@@ -19,6 +19,10 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       backendUrl: '',
+      apiDockerUrl: '',
     }
+  },
+  experimental: {
+    typedPages: true,
   }
 })
