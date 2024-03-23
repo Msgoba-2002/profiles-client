@@ -2,10 +2,27 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: [
-    '@nuxt/ui',
     '@formkit/nuxt',
+    'nuxt-icon',
+    '@pinia/nuxt',
   ],
   formkit: {
     autoImport: true,
+  },
+  postcss: {
+    plugins: {
+      tailwindcss: {},
+      autoprefixer: {},
+    },
+  },
+  css: ['~/assets/css/main.css'],
+  runtimeConfig: {
+    public: {
+      backendUrl: '',
+      apiDockerUrl: '',
+    }
+  },
+  experimental: {
+    typedPages: true,
   }
 })
