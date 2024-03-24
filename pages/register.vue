@@ -17,7 +17,7 @@ const snackbar = useSnackbar();
 
 const handleRegister = async (form: UserRegistrationForm) => {
   await registerUser(form);
-  if (isAuthenticated.value && user.value) {
+  if (user.value) {
     snackbar.add({
       title: 'Registration Successful',
       text: `${user.value?.first_name}, your account has been created successfully. Please login to continue.`,

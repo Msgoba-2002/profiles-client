@@ -71,7 +71,6 @@ export const useAuthStore = defineStore('auth', () => {
     const userStore = useUserStore();
     const {created_at, ...user} = data.value as NewlyRegisteredUser;
     userStore.setUser(user);
-    updateAuthState(true);
   }
 
   return {
