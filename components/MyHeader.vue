@@ -10,7 +10,6 @@ const btnText = computed(() => {
   return 'Login';
 });
 
-const router = useRouter();
 const handleAuth = async () => {
   if (isAuthenticated.value) {
     await logout();
