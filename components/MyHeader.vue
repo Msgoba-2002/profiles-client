@@ -11,13 +11,11 @@ const btnText = computed(() => {
 });
 
 const router = useRouter();
-const handleAuth = () => {
-  // handle login/logout
-  if (!isAuthenticated.value) {
-    router.push({ name: 'login' });
-    return;
+const handleAuth = async () => {
+  if (isAuthenticated.value) {
+    await logout();
   }
-  logout();
+  return navigateTo({ name: 'login' });
 }
 </script>
 

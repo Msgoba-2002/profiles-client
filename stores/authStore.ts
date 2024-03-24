@@ -1,5 +1,9 @@
-import { fetchKeys } from "../types/enums";
+import { fetchKeys } from "@/types/enums";
 import type { AuthenticatedUser, FetchedAuthenticatedUser, NewlyRegisteredUser, UserRegistrationForm } from "../types/user";
+import { ref } from "vue";
+import { defineStore } from "pinia";
+import { useUserStore } from './userStore';
+import { useApiFetch } from "@/composables/useApiFetch";
 
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref(false);
@@ -55,7 +59,6 @@ export const useAuthStore = defineStore('auth', () => {
     const userStore = useUserStore();
     updateAuthState(false);
     userStore.setUser(null);
-    return navigateTo({ name: 'login' });
   }
 
   const registerUser = async (credentials: UserRegistrationForm) => {
