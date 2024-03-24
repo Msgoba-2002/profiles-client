@@ -5,7 +5,6 @@ WORKDIR /client
 ENV PATH ./node_modules/.bin/:$PATH
 
 COPY package*.json ./
-RUN echo installing dependencies
 RUN npm ci --quiet
 
 COPY . .
