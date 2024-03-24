@@ -1,5 +1,5 @@
 import { fetchKeys } from "../types/enums";
-import type { AuthenticatedUser, FetchedAuthenticatedUser } from "../types/user";
+import type { AuthenticatedUser, FetchedAuthenticatedUser, NewlyRegisteredUser, UserRegistrationForm } from "../types/user";
 
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref(false);
@@ -10,7 +10,8 @@ export const useAuthStore = defineStore('auth', () => {
       key: fetchKeys.GetUser,
     });
     if (error.value) {
-      throw new Error(error.value.message);
+      console.log(error.value.message);
+      return;
     }
     const userStore = useUserStore();
     userStore.setUser((data.value as FetchedAuthenticatedUser).user);
@@ -57,6 +58,21 @@ export const useAuthStore = defineStore('auth', () => {
     return navigateTo({ name: 'login' });
   }
 
+  const registerUser = async (credentials: UserRegistrationForm) => {
+    const { data, pending, error } = await useApiFetch('/auth/register', {
+      method: 'POST',
+      key: fetchKeys.Register,
+      body: JSON.stringify(credentials)
+    });
+
+    if (error.value) {
+      throw new Error(error.value.message);
+    }
+    const userStore = useUserStore();
+    const {created_at, ...user} = data.value as NewlyRegisteredUser;
+    userStore.setUser(user);
+  }
+
   return {
     fetchUser,
     updateAuthState,
@@ -64,5 +80,6 @@ export const useAuthStore = defineStore('auth', () => {
     googleLogin,
     isAuthenticated,
     logout,
+    registerUser,
   }
 });

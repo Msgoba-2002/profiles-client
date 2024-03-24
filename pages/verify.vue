@@ -1,13 +1,14 @@
 <script setup lang="ts">
 definePageMeta({
-  middleware: ['guest-only'],
+  middleware: ['is-authenticated'],
   layout: 'auth-layout',
-})
+});
+
 </script>
 
 
 <template>
   <section class="py-4">
-    Reset password request
+    Verify your email
   </section>
 </template>
