@@ -1,0 +1,17 @@
+name: Run Tests in CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    
+jobs:
+  build:
+    runs-on: ubuntu-lts
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Application
+      run: docker build . --target test --tag MsgobaClient:$(date +%s)
