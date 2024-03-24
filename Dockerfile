@@ -1,5 +1,5 @@
 # Build
-FROM --platform=linux/arm64 node:20.11 AS build
+FROM node:20.11 AS build
 
 WORKDIR /client
 ENV PATH ./node_modules/.bin/:$PATH
