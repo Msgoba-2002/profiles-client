@@ -35,8 +35,8 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: stradox/msgoba-client:latest
+        tags: stradox4u/msgoba-client:latest
 
     - name: Run tests
       run: |
-        docker run --rm stradox/msgoba-client npm run test:ci
+        docker run --rm stradox4u/msgoba-client npm run test:ci
