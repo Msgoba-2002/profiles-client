@@ -14,14 +14,12 @@ jobs:
 
     steps:
 
-      - name: Checkout code
-        uses: actions/checkout@v3
-
+      - uses: actions/checkout@v3
+      - name: Build & Test
+        uses: actions/setup-node@v3
       - name: Install Node
         uses: actions/setup-node@v3
         with:
           node-version: 20.11.x
-          # cache: npm
-      
-      - name: Install dependencies and test
-        run: docker build . --target test --tag msgoba-client:$(date +%s)
+          cache: 'npm'
+      - run: docker build . --file Dockerfile --target test --tag msgoba-client:$(date +%s)
