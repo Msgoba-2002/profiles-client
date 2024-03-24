@@ -1,5 +1,5 @@
 import { setActivePinia, createPinia } from "pinia";
-import { useUserStore } from "@/stores/useUserStore";
+import { useUserStore } from "@/stores/userStore";
 
 beforeAll(() => {
   setActivePinia(createPinia());
