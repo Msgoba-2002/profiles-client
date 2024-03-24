@@ -1,4 +1,5 @@
 export const fetchKeys = {
+  Register: 'Register',
   Login: 'Login',
   Logout: 'Logout',
   GetUser: 'GetUser',

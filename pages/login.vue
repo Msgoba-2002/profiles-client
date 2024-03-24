@@ -1,6 +1,7 @@
 <script setup lang="ts">
 definePageMeta({
   middleware: ['guest-only'],
+  layout: 'auth-layout',
 });
 const { isAuthenticated } = storeToRefs(useAuthStore());
 const { googleLogin, emailLogin } = useAuthStore();
@@ -38,8 +39,8 @@ const handleLogin = async (body: { email: string; password: string; }) => {
           :config="{validationVisibility: 'dirty'}">
           <FormKit type="email" name="email" label="Email" required placeholder="your email address"
             :classes="{
-              label: 'text-oba-white text-base font-roboto',
-              input: 'w-full bg-oba-gray rounded-md p-2',
+              label: 'text-oba-white text-base font-roboto font-light',
+              input: 'w-full bg-oba-gray rounded-md p-2 placeholder:text-sm font-roboto',
               wrapper: 'flex flex-col gap-2',
               message: 'text-oba-gray text-xs font-roboto italic font-extralight',
               outer: 'flex flex-col gap-1',
@@ -47,8 +48,8 @@ const handleLogin = async (body: { email: string; password: string; }) => {
             :validation="[['required'], ['email']]"/>
           <FormKit type="password" name="password" label="Password" required placeholder="enter password"
             :classes="{
-              label: 'text-oba-white text-base font-roboto',
-              input: 'w-full bg-oba-gray rounded-md p-2',
+              label: 'text-oba-white text-base font-roboto font-light',
+              input: 'w-full bg-oba-gray rounded-md p-2 placeholder:text-sm font-roboto',
               wrapper: 'flex flex-col gap-2',
               message: 'text-oba-gray text-xs font-roboto italic font-extralight',
               outer: 'flex flex-col gap-1',

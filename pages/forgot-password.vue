@@ -1,5 +1,8 @@
 <script setup lang="ts">
-
+definePageMeta({
+  middleware: ['guest-only'],
+  layout: 'auth-layout',
+})
 </script>
 
 
