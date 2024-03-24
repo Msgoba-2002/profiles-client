@@ -5,7 +5,13 @@ export default defineNuxtConfig({
     '@formkit/nuxt',
     'nuxt-icon',
     '@pinia/nuxt',
+    'nuxt-snackbar',
   ],
+  snackbar: {
+    top: true,
+    left: true,
+    duration: 3000,
+  },
   formkit: {
     autoImport: true,
   },

@@ -13,12 +13,19 @@ const submitRegisterForm = () => {
 const { googleLogin, registerUser } = useAuthStore();
 const { isAuthenticated } = storeToRefs(useAuthStore());
 const { user } = storeToRefs(useUserStore());
+const snackbar = useSnackbar();
 
 const handleRegister = async (form: UserRegistrationForm) => {
   await registerUser(form);
   if (isAuthenticated.value && user.value) {
-    // TODO: Show success message
-    return navigateTo({ name: 'login' });
+    snackbar.add({
+      title: 'Registration Successful',
+      text: `${user.value?.first_name}, your account has been created successfully. Please login to continue.`,
+      type: 'success',
+    });
+    setTimeout(() => {
+      return navigateTo({ name: 'login' });
+    }, 3000);
   }
 }
 
