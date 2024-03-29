@@ -4,6 +4,7 @@ import { ref } from "vue";
 import { defineStore } from "pinia";
 import { useUserStore } from './userStore';
 import { useApiFetch } from "@/composables/useApiFetch";
+import type { EmailVerificationResponse } from "../types/verification";
 
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref(false);
@@ -62,7 +63,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const registerUser = async (credentials: UserRegistrationForm) => {
-    const { data, pending, error } = await useApiFetch('/auth/register', {
+    const { data, error } = await useApiFetch('/auth/register', {
       method: 'POST',
       key: fetchKeys.Register,
       body: JSON.stringify(credentials)
@@ -76,6 +77,47 @@ export const useAuthStore = defineStore('auth', () => {
     userStore.setUser(user);
   }
 
+  const requestPwReset = async ({ email }: { email: string; }) => {
+    const { data, error } = await useApiFetch('/auth/forgot-password', {
+      method: 'POST',
+      key: fetchKeys.ForgotPassword,
+      body: JSON.stringify({ email }),
+    });
+
+    if (error.value) {
+      throw new Error(error.value.message);
+    }
+
+    return data.value as EmailVerificationResponse;
+  }
+
+  const resendVerificationEmail = async () => {
+    const { data, error } = await useApiFetch('/auth/send-verification', {
+      method: 'GET',
+      key: fetchKeys.ResendVerification,
+    });
+
+    if (error.value) {
+      throw new Error(error.value.message);
+    }
+
+    return data.value as EmailVerificationResponse;
+  }
+
+  const verifyEmail = async (token: string) => {
+    const { data, error } = await useApiFetch('/auth/verify-email', {
+      method: 'PATCH',
+      key: fetchKeys.VerifyEmail,
+      body: JSON.stringify({ token }),
+    });
+
+    if (error.value) {
+      throw new Error(error.value.message);
+    }
+
+    return data.value as EmailVerificationResponse;
+  }
+
   return {
     fetchUser,
     updateAuthState,
@@ -84,5 +126,8 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     logout,
     registerUser,
+    requestPwReset,
+    resendVerificationEmail,
+    verifyEmail,
   }
 });

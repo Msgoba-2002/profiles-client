@@ -25,43 +25,53 @@ const transitionNames = [
 
 <template>
   <section class="my-8">
-    <div class="flex flex-row px-16 -space-x-8">
-      <div v-for="(pic, index) in displayOrder" key="pic" class="h-30 w-60 self-center"
-      :class="{ 'z-10': index === 1, 'scale-75': index !== 1 }">
-        <Transition :name="transitionNames[index]" mode="out-in">
-          <img :src="pic" :alt="'image:' + index" class="object-cover aspect-video shadow-oba-blue" :key="pic"
-            :class="{'shadow-lg': index === 1, 'shadow-md': index !== 1}" />
-        </Transition>
-      </div>
-    </div>
+    <Carousel :items-to-show="2" :wrap-around="true" :autoplay="3000" :transition="500" >
+      <Slide v-for="(pic, index) in images" :key="pic">
+        <img :src="pic" :alt="'image:' + index" class="object-cover aspect-video" />
+      </Slide>
+    </Carousel>
   </section>
 </template>
 
 
-<style scoped lang="css">
-.left-shrink-enter-from,
-.left-shrink-leave-to {
-  opacity: 0.4;
-  transform: scale(.9) translateX(-30px);
+<style scoped>
+.carousel__slide {
+  padding: 5px;
 }
 
-.left-grow-enter-from,
-.left-grow-leave-to {
-  opacity: 0.4;
-  transform: scale(1.1) translateX(-30px);
+.carousel__viewport {
+  perspective: 2000px;
 }
 
-.slide-right-enter-active,
-.slide-right-leave-active,
-.left-shrink-enter-active,
-.left-shrink-leave-active,
-.left-grow-enter-active,
-.left-grow-leave-active {
-  transition: all 0.8s ease;
+.carousel__track {
+  transform-style: preserve-3d;
 }
-.slide-right-enter-from,
-.slide-right-leave-to {
-  opacity: 0.4;
-  transform: translateX(100%);
+
+.carousel__slide--sliding {
+  transition: 0.5s;
+}
+
+.carousel__slide {
+  opacity: 0.9;
+  transform: rotateY(-20deg) scale(0.9);
+}
+
+.carousel__slide--active ~ .carousel__slide {
+  transform: rotateY(20deg) scale(0.9);
+}
+
+.carousel__slide--prev {
+  opacity: 1;
+  transform: rotateY(-10deg) scale(0.95);
+}
+
+.carousel__slide--next {
+  opacity: 1;
+  transform: rotateY(10deg) scale(0.95);
+}
+
+.carousel__slide--active {
+  opacity: 1;
+  transform: rotateY(0) scale(1.1);
 }
 </style>
