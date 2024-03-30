@@ -5,6 +5,7 @@ import { defineStore } from "pinia";
 import { useUserStore } from './userStore';
 import { useApiFetch } from "@/composables/useApiFetch";
 import type { EmailVerificationResponse } from "../types/verification";
+import type { PwResetDto, PwUpdateResponse } from "../types/password";
 
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref(false);
@@ -118,6 +119,20 @@ export const useAuthStore = defineStore('auth', () => {
     return data.value as EmailVerificationResponse;
   }
 
+  const updatePassword = async (payload: PwResetDto) => {
+    const { data, error } = await useApiFetch('/auth/update-password', {
+      method: 'PATCH',
+      key: fetchKeys.UpdatePassword,
+      body: JSON.stringify(payload),
+    });
+
+    if (error.value) {
+      throw new Error(error.value.message);
+    }
+
+    return data.value as PwUpdateResponse;
+  }
+
   return {
     fetchUser,
     updateAuthState,
@@ -129,5 +144,6 @@ export const useAuthStore = defineStore('auth', () => {
     requestPwReset,
     resendVerificationEmail,
     verifyEmail,
+    updatePassword,
   }
 });
