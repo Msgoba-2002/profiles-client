@@ -6,6 +6,7 @@ export default defineNuxtConfig({
     'nuxt-icon',
     '@pinia/nuxt',
     'nuxt-snackbar',
+    'vue3-carousel-nuxt',
   ],
   snackbar: {
     top: true,

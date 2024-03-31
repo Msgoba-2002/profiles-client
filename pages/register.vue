@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { UserRegistrationForm } from '@/types/user';
+import { pwConfirmed } from '@/utils/validators';
 
 definePageMeta({
   middleware: ['guest-only'],
@@ -27,15 +28,6 @@ const handleRegister = async (form: UserRegistrationForm) => {
       return navigateTo({ name: 'login' });
     }, 3000);
   }
-}
-
-const pwConfirmed = (node: any) => {
-  const parent = node.at('$parent');
-
-  if (parent.value) {
-    return parent.value['password'] === node.value;
-  }
-  return true;
 }
 
 </script>
