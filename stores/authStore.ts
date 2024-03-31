@@ -41,9 +41,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (error.value) {
       throw new Error(error.value.message);
     }
-    const userStore = useUserStore();
-    userStore.setUser(data.value as AuthenticatedUser);
-    updateAuthState(true);
+    await fetchUser();
   }
   
   const googleLogin = () => {
@@ -134,6 +132,10 @@ export const useAuthStore = defineStore('auth', () => {
     return data.value as PwUpdateResponse;
   }
 
+  const checkEligibility = async () => {
+    
+  }
+
   return {
     fetchUser,
     updateAuthState,
@@ -146,5 +148,6 @@ export const useAuthStore = defineStore('auth', () => {
     resendVerificationEmail,
     verifyEmail,
     updatePassword,
+    checkEligibility,
   }
 });

@@ -10,19 +10,19 @@ const submitEligibilityCheck = () => {
 
 const { checkEligibility } = useAuthStore();
 const snackbar = useSnackbar();
-const handleEligibilityCheck = async (form: ) => {
+const handleEligibilityCheck = async () => {
   try {
-    const data = await updatePassword({ password: form.password, confirm_password: form.confirm_password, token: token as string });
-    if (data.statusCode = 200) {
-      snackbar.add({
-        title: 'Password Updated',
-        text: 'Your password has been updated. Please login to continue.',
-        type: 'success',
-      });
-      setTimeout(() => {
-        return navigateTo({ name: 'login' });
-      }, 3000);
-    }
+    const data = await checkEligibility();
+    // if (data.statusCode = 200) {
+    //   snackbar.add({
+    //     title: 'Password Updated',
+    //     text: 'Your password has been updated. Please login to continue.',
+    //     type: 'success',
+    //   });
+    //   setTimeout(() => {
+    //     return navigateTo({ name: 'login' });
+    //   }, 3000);
+    // }
   } catch (error) {
     console.log(error);
   }
@@ -34,10 +34,10 @@ const handleEligibilityCheck = async (form: ) => {
   <section class="py-4">
     <div class="w-[70%] mx-auto bg-oba-red rounded-md">
       <div class="px-6 py-4">
-        <h1 class="font-roboto text-lg text-oba-white">Update Password</h1>
+        <h1 class="font-roboto text-lg text-oba-white">Eligibility Check</h1>
       </div>
       <div class="rounded-md bg-oba-gray p-6">
-        <FormKit type="form" id="pw-reset" @submit="handlePwReset" submit-label="Submit"
+        <FormKit type="form" id="pw-reset" @submit="handleEligibilityCheck" submit-label="Submit"
           :classes="{
             form: 'flex flex-col gap-6',
           }"
@@ -75,7 +75,7 @@ const handleEligibilityCheck = async (form: ) => {
               pwConfirmed: 'Passwords do not match'
             }" />
         </FormKit>
-        <UiBaseBtn @click="submitPwResetForm" label-text="Submit" button-type="button" text-style="text-oba-white text-base font-roboto"
+        <UiBaseBtn @click="submitEligibilityCheck" label-text="Submit" button-type="button" text-style="text-oba-white text-base font-roboto"
           class="w-full bg-oba-blue rounded-md py-2" />
       </div>
     </div>
