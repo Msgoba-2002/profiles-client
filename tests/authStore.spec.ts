@@ -63,7 +63,15 @@ describe("useAuthStore", () => {
       method: 'GET',
       key: fetchKeys.GetUser,
     });
+
+    const {user} = storeToRefs(useUserStore());
     expect(store.isAuthenticated).toBe(true);
+    expect(user.value).toHaveProperty('id', '123abc');
+    expect(user.value).toHaveProperty('email', 'test@test.com');
+    expect(user.value).toHaveProperty('first_name', 'Test');
+    expect(user.value).toHaveProperty('last_name', 'User');
+    expect(user.value).toHaveProperty('email_verified', false);
+    expect(user.value).toHaveProperty('questions_verified', false);
   });
 
   it('correctly updates state after email login', async () => {
@@ -88,7 +96,7 @@ describe("useAuthStore", () => {
 
     await store.emailLogin('test@test.com', 'password');
 
-    expect(mockedFetch).toHaveBeenCalledOnce();
+    expect(mockedFetch).toBeCalledTimes(2);
     expect(mockedFetch).toHaveBeenCalledWith('/auth/login', {
       method: 'POST',
       key: fetchKeys.Login,
@@ -100,13 +108,12 @@ describe("useAuthStore", () => {
         'Content-Type': 'application/json',
       }
     });
+
+    expect(mockedFetch).toHaveBeenCalledWith('/auth/user', {
+      method: 'GET',
+      key: fetchKeys.GetUser,
+    });
     expect(store.isAuthenticated).toBe(true);
-    expect(user.value).toHaveProperty('id', '123abc');
-    expect(user.value).toHaveProperty('email', 'test@test.com');
-    expect(user.value).toHaveProperty('first_name', 'Test');
-    expect(user.value).toHaveProperty('last_name', 'User');
-    expect(user.value).toHaveProperty('email_verified', false);
-    expect(user.value).toHaveProperty('questions_verified', false);
   });
 
   it('logs out correctly', async () => {
