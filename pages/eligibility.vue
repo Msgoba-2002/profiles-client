@@ -4,6 +4,7 @@ definePageMeta({
   layout: 'auth-layout',
 });
 
+
 const submitEligibilityCheck = () => {
   submitForm('check-eligibility');
 }
