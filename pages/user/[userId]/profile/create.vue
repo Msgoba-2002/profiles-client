@@ -1,6 +1,9 @@
 <script setup lang="ts">
-const { getUploadUrl, storeProfile } = useProfileStore();
 import type { CreateProfileRawForm, IUploadedFile } from '@/types/profile';
+
+const { getUploadUrl, storeProfile } = useProfileStore();
+const { fetchUser } = useAuthStore();
+const { user } = storeToRefs(useUserStore());
 
 const classLevelOptions = ['JSS', 'SSS'];
 const classLevel = ref('JSS');
@@ -33,26 +36,34 @@ const submitProfileCreate = () => {
   submitForm('profile-create');
 }
 
+const creatingProfile = ref(false);
 const handleProfileCreate = async (form: CreateProfileRawForm) => {
+  creatingProfile.value = true;
   try {
     const profilePic = form.profile_picture[0];
     const uploadedProfilePicUrl = await uploadImg(profilePic.file);
 
-    const { classLevel, classValue, classArm, hobbies, birthday, ...rest } = form;
+    const { hobbies, birthday, ...rest } = form;
     const hobbiesArray = hobbies.split(',').map((hobby) => hobby.trim()).filter(Boolean);
     const profileData = {
       ...rest,
       profile_picture: uploadedProfilePicUrl,
-      final_class: `${classLevel} - ${classValue}${classArm}`,
+      final_class: `${classLevel.value} - ${classValue.value}${classArm.value}`,
       hobbies: hobbiesArray,
       birthday: new Date(birthday),
     };
 
     const response = await storeProfile(profileData);
-    debugger;
+    fetchUser(true);
+
+    creatingProfile.value = false;
+
+    if (user.value) {
+      return navigateTo({ name: 'user-userId', params: { userId: user.value?.id } });
+    }
   } catch (err) {
     console.error(err);
-    return;
+    creatingProfile.value = false;
   }
 }
 
@@ -263,7 +274,11 @@ const fileSelected = (event: any) => {
             :validation="[['required'], ['length', 30, 200]]" />
         </FormKit>
         <UiBaseBtn @click="submitProfileCreate" label-text="Submit" button-type="button" text-style="text-oba-white text-base font-roboto"
-          class="w-full bg-oba-blue rounded-md py-2" />
+          class="w-full bg-oba-blue rounded-md py-2" >
+          <template #appendIcon>
+            <Icon v-if="creatingProfile" name="line-md:loading-alt-loop" size="16px" class="text-oba-white" />
+          </template>
+        </UiBaseBtn>
       </div>
     </div>
   </section>

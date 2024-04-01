@@ -29,9 +29,6 @@ export interface CreateProfileRawForm {
   place_of_residence: string;
   hobbies: string;
   bio: string;
-  classValue: string;
-  classLevel: string;
-  classArm: string;
 }
 
 export interface IProfileDto {
