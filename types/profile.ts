@@ -1,6 +1,7 @@
 export interface AuthProfile {
   id: string;
   current_position: string;
+  profile_picture: string;
 }
 
 export interface IProfile {

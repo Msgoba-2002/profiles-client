@@ -54,7 +54,7 @@ const handleProfileCreate = async (form: CreateProfileRawForm) => {
     };
 
     const response = await storeProfile(profileData);
-    fetchUser(true);
+    await fetchUser(true);
 
     creatingProfile.value = false;
 
@@ -274,7 +274,7 @@ const fileSelected = (event: any) => {
             :validation="[['required'], ['length', 30, 200]]" />
         </FormKit>
         <UiBaseBtn @click="submitProfileCreate" label-text="Submit" button-type="button" text-style="text-oba-white text-base font-roboto"
-          class="w-full bg-oba-blue rounded-md py-2" >
+          :isDisabled="creatingProfile" class="w-full bg-oba-blue rounded-md py-2" >
           <template #appendIcon>
             <Icon v-if="creatingProfile" name="line-md:loading-alt-loop" size="16px" class="text-oba-white" />
           </template>
