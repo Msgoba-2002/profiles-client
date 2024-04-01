@@ -6,3 +6,8 @@ export const pwConfirmed = (node: any) => {
   }
   return true;
 }
+
+export const stringToArray = (node: any, count: number) => {
+  const valuesArray = node.value.split(',').map((value: string) => value.trim());
+  return valuesArray.filter(Boolean).length >= count;
+}

@@ -3,7 +3,7 @@ definePageMeta({
   layout: 'auth-layout',
 });
 
-const { verifyEmail } = useAuthStore();
+const { verifyEmail, fetchUser } = useAuthStore();
 const route = useRoute();
 const { token } = route.query;
 const { user } = storeToRefs(useUserStore());
@@ -13,6 +13,7 @@ const runVerification = async () => {
   try {
     const data = await verifyEmail(token as string);
     if (data.statusCode === 200 && user.value) {
+      await fetchUser(true);
       return navigateTo({ name: 'user-userId', params: { userId: user.value.id } });
     }
   } catch (err) {

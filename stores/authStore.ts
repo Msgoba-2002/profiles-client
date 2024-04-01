@@ -10,7 +10,9 @@ import type { PwResetDto, PwUpdateResponse } from "../types/password";
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref(false);
 
-  const fetchUser = async () => {
+  const fetchUser = async (refresh = false) => {
+    const userStore = useUserStore();
+    refresh && userStore.userRefresh();
     const { data, error } = await useApiFetch('/auth/user', {
       method: 'GET',
       key: fetchKeys.GetUser,
@@ -19,7 +21,6 @@ export const useAuthStore = defineStore('auth', () => {
       console.log(error.value.message);
       return;
     }
-    const userStore = useUserStore();
     userStore.setUser((data.value as FetchedAuthenticatedUser).user);
     updateAuthState(true);
   }
@@ -40,9 +41,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (error.value) {
       throw new Error(error.value.message);
     }
-    const userStore = useUserStore();
-    userStore.setUser(data.value as AuthenticatedUser);
-    updateAuthState(true);
+    await fetchUser();
   }
   
   const googleLogin = () => {
@@ -133,6 +132,10 @@ export const useAuthStore = defineStore('auth', () => {
     return data.value as PwUpdateResponse;
   }
 
+  const checkEligibility = async () => {
+    
+  }
+
   return {
     fetchUser,
     updateAuthState,
@@ -145,5 +148,6 @@ export const useAuthStore = defineStore('auth', () => {
     resendVerificationEmail,
     verifyEmail,
     updatePassword,
+    checkEligibility,
   }
 });
