@@ -7,6 +7,8 @@ export const fetchKeys = {
   ResendVerification: 'ResendVerification',
   VerifyEmail: 'VerifyEmail',
   UpdatePassword: 'UpdatePassword',
+  UploadUrl: 'UploadUrl',
+  StoreProfile: 'StoreProfile',
 } as const;
 
 export type FetchKeys = keyof typeof fetchKeys;

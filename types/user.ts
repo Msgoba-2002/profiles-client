@@ -1,3 +1,4 @@
+import type { AuthProfile } from "./profile";
 
 export interface AuthenticatedUser {
   id: string;
@@ -6,6 +7,7 @@ export interface AuthenticatedUser {
   last_name: string;
   email_verified: boolean;
   questions_verified: boolean;
+  Profile: AuthProfile;
 }
 
 export interface FetchedAuthenticatedUser {
