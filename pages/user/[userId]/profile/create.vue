@@ -1,36 +1,16 @@
 <script setup lang="ts">
-import type { CreateProfileRawForm, IUploadedFile } from '@/types/profile';
+import type { CreateProfileRawForm } from '@/types/profile';
+import { classLevelOptions, classOptions, classArmOptions } from '@/constants/classes';
 
-const { getUploadUrl, storeProfile } = useProfileStore();
+const { storeProfile } = useProfileStore();
 const { fetchUser } = useAuthStore();
 const { user } = storeToRefs(useUserStore());
 
-const classLevelOptions = ['JSS', 'SSS'];
 const classLevel = ref('JSS');
-
-const classOptions = ['1', '2', '3'];
 const classValue = ref('1');
-
-const classArmOptions = ['A', 'B', 'C', 'D', 'E', 'F'];
 const classArm = ref('A');
 
-const uploadImg = async (file: File) => {
-  const { url: uploadUrl } = await getUploadUrl(file.type);
-
-  await $fetch(uploadUrl, {
-    method: 'PUT',
-    body: file,
-    headers: {
-      'Content-Type': file.type,
-      'Content-Length': file.size.toString(),
-    },
-  }).catch((err) => {
-    console.error(err);
-    throw new Error('Failed to upload image');
-  });
-  const urlObject = new URL(uploadUrl);
-  return urlObject.pathname;
-}
+const uploadImg = useImgUpload();
 
 const submitProfileCreate = () => {
   submitForm('profile-create');
@@ -50,10 +30,10 @@ const handleProfileCreate = async (form: CreateProfileRawForm) => {
       profile_picture: uploadedProfilePicUrl,
       final_class: `${classLevel.value} - ${classValue.value}${classArm.value}`,
       hobbies: hobbiesArray,
-      birthday: new Date(birthday),
+      birthday: new Date(birthday).toISOString(),
     };
 
-    const response = await storeProfile(profileData);
+    await storeProfile(profileData);
     await fetchUser(true);
 
     creatingProfile.value = false;
@@ -219,7 +199,7 @@ const fileSelected = (event: any) => {
               outer: 'flex flex-col gap-1',
             }" 
             :validation-rules="{ stringToArray }"
-            :validation-messages="{ stringToArray: 'Please enter multiple hobbies separated by commas' }"
+            :validation-messages="{ stringToArray: 'Please enter at least 3 hobbies separated by commas' }"
             :validation="[['required'], ['stringToArray', 3]]" />
 
           <div class="flex flex-col gap-1">

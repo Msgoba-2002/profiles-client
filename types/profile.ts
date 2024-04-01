@@ -1,14 +1,3 @@
-export interface AuthProfile {
-  id: string;
-  current_position: string;
-  profile_picture: string;
-}
-
-export interface IProfile {
-  id: string;
-  user_id: string;
-}
-
 export interface IUploadUrl {
   url: string;
 }
@@ -36,7 +25,7 @@ export interface IProfileDto {
   profile_picture: string;
   phone_number: string;
   nickname?: string;
-  birthday: Date;
+  birthday: string;
   marital_status: string;
   occupation_status: string;
   occupation: string;
@@ -47,6 +36,10 @@ export interface IProfileDto {
   final_class: string;
 }
 
+export interface IProfileUpdateDto extends Partial<IProfileDto>{}
+
 export interface IFullProfile extends IProfileDto {
   current_position: string;
+  id: string;
+  user_id: string;
 }

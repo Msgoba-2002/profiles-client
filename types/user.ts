@@ -1,4 +1,4 @@
-import type { AuthProfile } from "./profile";
+import type { IFullProfile } from "./profile";
 
 export interface AuthenticatedUser {
   id: string;
@@ -7,7 +7,7 @@ export interface AuthenticatedUser {
   last_name: string;
   email_verified: boolean;
   questions_verified: boolean;
-  Profile: AuthProfile;
+  Profile: IFullProfile;
 }
 
 export interface FetchedAuthenticatedUser {

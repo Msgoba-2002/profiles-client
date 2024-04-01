@@ -9,6 +9,9 @@ export const fetchKeys = {
   UpdatePassword: 'UpdatePassword',
   UploadUrl: 'UploadUrl',
   StoreProfile: 'StoreProfile',
+  GetMyProfile: 'GetMyProfile',
+  UpdateProfile: 'UpdateProfile',
+  DeleteImage: 'DeleteImage',
 } as const;
 
 export type FetchKeys = keyof typeof fetchKeys;
