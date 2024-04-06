@@ -16,6 +16,7 @@ export const fetchKeys = {
   AddQuestion: 'AddQuestion',
   UpdateQuestion: 'UpdateQuestion',
   DeleteQuestion: 'DeleteQuestion',
+  CheckEligibility: 'CheckEligibility',
 } as const;
 
 export type FetchKeys = keyof typeof fetchKeys;

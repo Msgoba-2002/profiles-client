@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { fetchKeys } from '@/types/enums';
+import type { EligibilityAnswer, EligibilityResponse } from '@/types/eligibility';
+
 definePageMeta({
-  middleware: ['is-authenticated', 'is-verified'],
+  middleware: ['is-authenticated', 'is-verified', 'mustnt-have-verified-questions'],
   layout: 'auth-layout',
 });
 
@@ -9,30 +12,54 @@ const submitEligibilityCheck = () => {
   submitForm('check-eligibility');
 }
 
-const { checkEligibility } = useAuthStore();
+
 const snackbar = useSnackbar();
 const { fetchQuestions } = useQuestionsStore();
 await fetchQuestions();
 const { questions } = storeToRefs(useQuestionsStore());
+const { user } = storeToRefs(useUserStore());
+const { fetchUser } = useAuthStore();
+
+const isChecking = ref(false);
 const handleEligibilityCheck = async (form: Record<string, string>) => {
-  const data: Record<string, string> = {};
+  isChecking.value = true;
+  const dto: EligibilityAnswer[] = [];
   Object.keys(form).forEach((key) => {
-    data[key] = form[key];
+    const relevantQuestion = questions.value.find((question) => question.id === key);
+    const answer = relevantQuestion?.options.findIndex((option) => option === form[key]);
+    dto.push({ question_id: key, provided_answer: answer as number });
   });
-  try {
-    const data = await checkEligibility();
-    // if (data.statusCode = 200) {
-    //   snackbar.add({
-    //     title: 'Password Updated',
-    //     text: 'Your password has been updated. Please login to continue.',
-    //     type: 'success',
-    //   });
-    //   setTimeout(() => {
-    //     return navigateTo({ name: 'login' });
-    //   }, 3000);
-    // }
-  } catch (error) {
-    console.log(error);
+  const { data, error, pending } = await useApiFetch('/questions/answers', {
+    method: 'POST',
+    body: JSON.stringify(dto),
+    key: fetchKeys.CheckEligibility,
+  });
+  if (error.value) {
+    snackbar.add({
+      title: 'Error',
+      text: error.value.message,
+      type: 'error',
+    });
+  }
+
+  isChecking.value = pending.value;
+  const eligibilityResponse = data.value as EligibilityResponse;
+  if (eligibilityResponse.success) {
+    snackbar.add({
+      title: 'Success',
+      text: eligibilityResponse.message,
+      type: 'success',
+    });
+    await fetchUser(true);
+    if (user.value) {
+      return navigateTo({ name: 'user-userId', params: { userId: user.value.id } });
+    }
+  } else {
+    snackbar.add({
+      title: 'Error',
+      text: eligibilityResponse.message,
+      type: 'error',
+    });
   }
 }
 </script>
@@ -69,7 +96,7 @@ const handleEligibilityCheck = async (form: Record<string, string>) => {
           </div>
         </FormKit>
         <UiBaseBtn @click="submitEligibilityCheck" label-text="Submit" button-type="button" text-style="text-oba-white text-base font-roboto"
-          class="w-full bg-oba-blue rounded-md py-2" />
+          class="w-full bg-oba-blue rounded-md py-2" :is-disabled="isChecking" />
       </div>
     </div>
   </section>

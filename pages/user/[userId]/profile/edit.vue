@@ -2,7 +2,6 @@
 import { classOptions, classLevelOptions, classArmOptions } from '@/constants/classes';
 import type { CreateProfileRawForm, IProfileUpdateDto } from '@/types/profile';
 import { stringToArray } from '@/utils/validators';
-import { fetchKeys } from '../../../../types/enums';
 
 definePageMeta({
   middleware: ['is-authenticated', 'is-verified', 'is-eligible', 'has-profile'],

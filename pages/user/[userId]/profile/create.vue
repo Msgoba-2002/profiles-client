@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  middleware: ['is-authenticated', 'is-verified', 'is-eligible', 'mustnt-have-profile'],
+});
+
 import type { CreateProfileRawForm } from '@/types/profile';
 import { classLevelOptions, classOptions, classArmOptions } from '@/constants/classes';
 
