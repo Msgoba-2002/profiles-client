@@ -132,10 +132,6 @@ export const useAuthStore = defineStore('auth', () => {
     return data.value as PwUpdateResponse;
   }
 
-  const checkEligibility = async () => {
-    
-  }
-
   return {
     fetchUser,
     updateAuthState,
@@ -148,6 +144,5 @@ export const useAuthStore = defineStore('auth', () => {
     resendVerificationEmail,
     verifyEmail,
     updatePassword,
-    checkEligibility,
   }
 });

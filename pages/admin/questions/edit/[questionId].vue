@@ -3,7 +3,7 @@ definePageMeta({
   middleware: ['is-authenticated', 'is-verified', 'has-profile', 'is-admin'],
 });
 
-import type { CreateQuestionForm } from '@/types/question';
+import type { UpdateQuestionForm } from '@/types/question';
 
 const answerOptions = [
   { value: 0, label: 'A' },
@@ -11,9 +11,18 @@ const answerOptions = [
   { value: 2, label: 'C' },
 ];
 
+const { updateQuestion, fetchQuestions } = useQuestionsStore();
+await fetchQuestions();
+
 const savingQuestion = ref(false);
-const { addQuestion } = useQuestionsStore();
-const handleCreateQuestion = async (form: CreateQuestionForm) => {
+const route = useRoute();
+const qId = (route.params as { questionId: string; }).questionId;
+const { questions } = storeToRefs(useQuestionsStore());
+const question = computed(() => {
+  return questions.value.find(q => q.id === qId);
+});
+
+const handleUpdateQuestion = async (form: UpdateQuestionForm) => {
   savingQuestion.value = true;
   const dto = {
     question: form.question,
@@ -21,12 +30,11 @@ const handleCreateQuestion = async (form: CreateQuestionForm) => {
     correct_option: form.correct_answer,
   }
 
-  await addQuestion(dto);
+  await updateQuestion(dto, qId);
   savingQuestion.value = false;
-  navigateTo({ name: 'admin-questions' });
 }
 
-const submitQuestionCreate = () => {
+const submitQuestionEdit = () => {
   submitForm('questions-edit');
 }
 
@@ -37,10 +45,10 @@ const submitQuestionCreate = () => {
   <section class="py-4">
     <div class="w-[70%] mx-auto bg-oba-red rounded-md">
       <div class="px-6 py-4">
-        <h1 class="font-roboto text-lg text-oba-white">Create Eligibility Question</h1>
+        <h1 class="font-roboto text-lg text-oba-white">Update Eligibility Questions</h1>
       </div>
       <div class="rounded-md bg-oba-gray p-6">
-        <FormKit type="form" id="questions-edit" @submit="handleCreateQuestion" submit-label="Submit"
+        <FormKit type="form" id="questions-edit" @submit="handleUpdateQuestion" submit-label="Submit"
           :classes="{
             form: 'flex flex-col gap-6',
           }"
@@ -48,7 +56,7 @@ const submitQuestionCreate = () => {
             'wrapper-class': 'hidden',
           }"
           :config="{validationVisibility: 'dirty'}">
-          <FormKit type="textarea" name="question" label="Question" required rows="3"
+          <FormKit type="textarea" name="question" label="Question" required rows="3" :value="question?.question"
             :classes="{
               label: 'text-oba-black text-base font-roboto',
               input: 'w-full bg-oba-white rounded-md p-2 placeholder:text-sm font-roboto',
@@ -61,7 +69,7 @@ const submitQuestionCreate = () => {
 
             <h4 class="font-roboto text-oba-black text-lg font-light">Answers</h4>
 
-          <FormKit type="text" name="option_a" label="A" required
+          <FormKit type="text" name="option_a" label="A" required :value="question?.options[0]"
             :classes="{
               label: 'text-oba-black text-base font-roboto',
               input: 'w-full bg-oba-white rounded-md p-2 placeholder:text-sm font-roboto',
@@ -70,7 +78,7 @@ const submitQuestionCreate = () => {
               outer: 'flex flex-col gap-1',
             }"
             :validation="[['required'], ['length', 5]]" />
-          <FormKit type="text" name="option_b" label="B" required
+          <FormKit type="text" name="option_b" label="B" required :value="question?.options[1]"
             :classes="{
               label: 'text-oba-black text-base font-roboto',
               input: 'w-full bg-oba-white rounded-md p-2 placeholder:text-sm font-roboto',
@@ -79,7 +87,7 @@ const submitQuestionCreate = () => {
               outer: 'flex flex-col gap-1',
             }"
             :validation="[['required'], ['length', 5]]" />
-          <FormKit type="text" name="option_c" label="C" required
+          <FormKit type="text" name="option_c" label="C" required :value="question?.options[2]"
             :classes="{
               label: 'text-oba-black text-base font-roboto',
               input: 'w-full bg-oba-white rounded-md p-2 placeholder:text-sm font-roboto',
@@ -101,7 +109,7 @@ const submitQuestionCreate = () => {
 
           </div>
         </FormKit>
-        <UiBaseBtn @click="submitQuestionCreate" label-text="Submit" button-type="button" text-style="text-oba-white text-base font-roboto"
+        <UiBaseBtn @click="submitQuestionEdit" label-text="Submit" button-type="button" text-style="text-oba-white text-base font-roboto"
           class="w-full bg-oba-blue rounded-md py-2" :is-disabled="savingQuestion" />
       </div>
     </div>

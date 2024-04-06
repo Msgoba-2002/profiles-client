@@ -1,6 +1,12 @@
 <script setup lang="ts">
+definePageMeta({
+  middleware: ['is-authenticated', 'is-verified', 'is-eligible', 'mustnt-have-profile'],
+});
+
 import type { CreateProfileRawForm } from '@/types/profile';
 import { classLevelOptions, classOptions, classArmOptions } from '@/constants/classes';
+import { fetchKeys } from '@/types/enums';
+import type { IProtoProfile } from '@/types/protoProfile';
 
 const { storeProfile } = useProfileStore();
 const { fetchUser } = useAuthStore();
@@ -15,6 +21,12 @@ const uploadImg = useImgUpload();
 const submitProfileCreate = () => {
   submitForm('profile-create');
 }
+
+const { data: { value: protoProfileValue } } = await useApiFetch(`/protoprofile?email=${user.value?.email}`, {
+  method: 'GET',
+  key: fetchKeys.GetProtoProfile,
+});
+const protoProfile = protoProfileValue as IProtoProfile;
 
 const creatingProfile = ref(false);
 const handleProfileCreate = async (form: CreateProfileRawForm) => {
@@ -101,7 +113,7 @@ const fileSelected = (event: any) => {
             </div>
           </div>
 
-          <FormKit type="tel" name="phone_number" label="Phone Number" required
+          <FormKit type="tel" name="phone_number" label="Phone Number" required :value="protoProfile.phone_number"
             placeholder="ex. 2348012345678" minlength="13"
             :classes="{
               label: 'text-oba-black text-base font-roboto font-light',
@@ -112,7 +124,7 @@ const fileSelected = (event: any) => {
             }" 
             :validation="[['required'], ['length', 11]]"/>
 
-          <FormKit type="text" name="nickname" label="Nickname"
+          <FormKit type="text" name="nickname" label="Nickname" :value="protoProfile.nickname"
             placeholder="what did we call you in school?"
             :classes="{
               label: 'text-oba-black text-base font-roboto font-light',
@@ -123,7 +135,7 @@ const fileSelected = (event: any) => {
             }" 
             :validation="[['length', 3]]"/>
 
-          <FormKit type="date" name="birthday" label="Birthday"
+          <FormKit type="date" name="birthday" label="Birthday" :value="protoProfile.date_of_birth"
             help="choose your date of birth"
             :classes="{
               label: 'text-oba-black text-base font-roboto font-light',
