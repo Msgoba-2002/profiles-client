@@ -1,3 +1,3 @@
-export interface EligibilityQuestion {
+export interface EligibilityAnswers {
   
 }

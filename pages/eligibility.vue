@@ -11,7 +11,14 @@ const submitEligibilityCheck = () => {
 
 const { checkEligibility } = useAuthStore();
 const snackbar = useSnackbar();
-const handleEligibilityCheck = async () => {
+const { fetchQuestions } = useQuestionsStore();
+await fetchQuestions();
+const { questions } = storeToRefs(useQuestionsStore());
+const handleEligibilityCheck = async (form: Record<string, string>) => {
+  const data: Record<string, string> = {};
+  Object.keys(form).forEach((key) => {
+    data[key] = form[key];
+  });
   try {
     const data = await checkEligibility();
     // if (data.statusCode = 200) {
@@ -38,7 +45,7 @@ const handleEligibilityCheck = async () => {
         <h1 class="font-roboto text-lg text-oba-white">Eligibility Check</h1>
       </div>
       <div class="rounded-md bg-oba-gray p-6">
-        <FormKit type="form" id="pw-reset" @submit="handleEligibilityCheck" submit-label="Submit"
+        <FormKit type="form" id="check-eligibility" @submit="handleEligibilityCheck" submit-label="Submit"
           :classes="{
             form: 'flex flex-col gap-6',
           }"
@@ -46,35 +53,20 @@ const handleEligibilityCheck = async () => {
             'wrapper-class': 'hidden',
           }"
           :config="{validationVisibility: 'dirty'}">
-          <FormKit type="password" name="password" label="Password" required placeholder="enter password"
-            :classes="{
-              label: 'text-oba-black text-base font-roboto',
-              input: 'w-full bg-oba-white rounded-md p-2 placeholder:text-sm font-roboto',
-              wrapper: 'flex flex-col gap-2',
-              message: 'text-oba-black text-xs font-roboto italic font-light',
-              outer: 'flex flex-col gap-1',
-            }"
-            :validation="[['required'], ['length', 8]]"
-            :validation-messages="{
-              length: 'Password must be at least 8 characters long',
-              matches: 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
-            }" />
-
-          <FormKit type="password" name="confirm_password" label="Confirm Password" required placeholder="confirm password"
-            :classes="{
-              label: 'text-oba-black text-base font-roboto',
-              input: 'w-full bg-oba-white rounded-md p-2 placeholder:text-sm font-roboto',
-              wrapper: 'flex flex-col gap-2',
-              message: 'text-oba-black text-xs font-roboto italic font-light',
-              outer: 'flex flex-col gap-1',
-            }"
-            :validation="[['required'], ['pwConfirmed']]"
-            :validation-rules="{
-              pwConfirmed
-            }"
-            :validation-messages="{
-              pwConfirmed: 'Passwords do not match'
-            }" />
+          <div v-for="question in questions" :key="question.id" class="bg-oba-white rounded-md p-2">
+            <FormKit type="radio" :name="question.id" 
+              :label="question.question + (question.question.endsWith('?') ? '' : '?')" required
+              :options="question.options"
+              :classes="{
+                label: 'text-oba-black text-base font-roboto',
+                wrapper: 'flex flex-col gap-2',
+                message: 'text-oba-black text-xs font-roboto italic font-light',
+                outer: 'flex flex-col gap-1',
+                options: 'flex flex-row justify-between',
+              }"
+              :validation="[['required']]"
+              />
+          </div>
         </FormKit>
         <UiBaseBtn @click="submitEligibilityCheck" label-text="Submit" button-type="button" text-style="text-oba-white text-base font-roboto"
           class="w-full bg-oba-blue rounded-md py-2" />
