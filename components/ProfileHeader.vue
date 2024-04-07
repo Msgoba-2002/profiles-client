@@ -25,7 +25,7 @@ const showEditProfile = computed(() => {
             text-style="text-oba-white text-base font-roboto">
           </UiLinkAsBtn>
           
-          <UiLinkAsBtn :link-dest="{name: 'user-userId-profile-edit', params: { userId: user?.id } }"
+          <UiLinkAsBtn link-dest="#"
             label-text="View Excos" class="w-full bg-oba-blue rounded-md py-2"
             text-style="text-oba-white text-base font-roboto">
           </UiLinkAsBtn>
