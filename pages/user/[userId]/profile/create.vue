@@ -218,7 +218,7 @@ const fileSelected = (event: any) => {
             <label for="" class="text-oba-black text-base font-roboto font-light">Final Class</label>
             <div class="w-full bg-oba-red rounded-md p-4 flex flex-col gap-2">
               <span class="text-sm text-oba-white font-roboto font-light">In what class did you leave?</span>
-              <div class="grid grid-cols-3 gap-2 items-center">
+              <div class="grid sm:grid-cols-3 grid-cols-1 sm:gap-2 gap-4 items-center">
                 <FormKit v-model="classLevel" type="radio"
                   :options="classLevelOptions"
                   :classes="{
@@ -242,7 +242,7 @@ const fileSelected = (event: any) => {
                     :options="classArmOptions"
                     :classes="{
                       options: 'grid grid-cols-3 gap-2',
-                      wrapper: 'flex flex-row gap-1 justify-end',
+                      wrapper: 'flex flex-row gap-1 sm:justify-end justify-start',
                       outer: 'col-span-1',
                       label: 'text-oba-white text-base font-roboto'
                     }"/>
