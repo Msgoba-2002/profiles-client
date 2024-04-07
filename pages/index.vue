@@ -1,12 +1,7 @@
 <script lang="ts" setup>
 definePageMeta({
   middleware: ['musnt-be-authenticated'],
-})
-
-const router = useRouter();
-const goToLogin = () => {
-  router.push({ name: 'login' });
-  }
+});
 </script>
 
 <template>
@@ -15,7 +10,7 @@ const goToLogin = () => {
       <h1 class="font-roboto font-semibold text-3xl text-center">MSGOBA 2002</h1>
       <p class="text-center text-sm italic font-roboto">Mount Saint Gabriel's Secondary School Makurdi Old Boys Association, Set of 2002!</p>
     </div>
-    <img src="/class_banner.jpeg" alt="">
+    <img src="/class_banner.jpeg" alt="futuristic banner img">
     <div class="flex flex-col gap-4 items-center p-8">
       <div class="inline-flex items-center gap-4">
         <span class="text-oba-black font-roboto text-lg">Are you one of us?</span>

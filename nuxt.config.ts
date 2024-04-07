@@ -7,6 +7,7 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     'nuxt-snackbar',
     'vue3-carousel-nuxt',
+    '@nuxt/test-utils/module',
   ],
   snackbar: {
     top: true,
