@@ -1,5 +1,5 @@
-import { defineConfig } from 'vitest/config';
-import vue from '@vitejs/plugin-vue';
+import { defineVitestConfig } from '@nuxt/test-utils/config';
+// import vue from '@vitejs/plugin-vue';
 import { fileURLToPath } from 'url';
 
 const alias = {
@@ -7,8 +7,8 @@ const alias = {
 };
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [vue()],
+export default defineVitestConfig({
+  // plugins: [vue()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./', import.meta.url)),
