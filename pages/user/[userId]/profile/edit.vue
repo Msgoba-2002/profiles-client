@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { classOptions, classLevelOptions, classArmOptions } from '@/constants/classes';
 import type { CreateProfileRawForm, IProfileUpdateDto } from '@/types/profile';
-import { stringToArray } from '@/utils/validators';
+import { stringToArray, acceptedImgFormat } from '@/utils/validators';
 
 definePageMeta({
   middleware: ['is-authenticated', 'is-verified', 'is-eligible', 'has-profile'],
@@ -118,7 +118,14 @@ const fileSelected = (event: any) => {
                 fileItem: 'hidden',
                 noFiles: 'hidden'
                 
-              }" />
+              }" 
+              :validation="[['acceptedImgFormat']]"
+              :validation-rules="{
+                acceptedImgFormat
+              }"
+              :validation-messages="{
+                acceptedImgFormat: 'Image must be a .jpg, .jpeg, or .png file'
+              }"/>
             </div>
             <div class="w-[20%] self-center" v-if="photoPreview">
               <span class="block rounded-full w-12 h-12"
