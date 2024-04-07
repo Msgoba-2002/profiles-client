@@ -110,7 +110,11 @@ const submitQuestionEdit = () => {
           </div>
         </FormKit>
         <UiBaseBtn @click="submitQuestionEdit" label-text="Submit" button-type="button" text-style="text-oba-white text-base font-roboto"
-          class="w-full bg-oba-blue rounded-md py-2" :is-disabled="savingQuestion" />
+          class="w-full bg-oba-blue rounded-md py-2" :is-disabled="savingQuestion" >
+          <template #appendIcon>
+            <Icon v-if="savingQuestion" name="line-md:loading-alt-loop" size="16px" class="text-oba-white" />
+          </template>
+        </UiBaseBtn>
       </div>
     </div>
   </section>

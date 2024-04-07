@@ -1,4 +1,8 @@
 <script lang="ts" setup>
+definePageMeta({
+  middleware: ['musnt-be-authenticated'],
+})
+
 const router = useRouter();
 const goToLogin = () => {
   router.push({ name: 'login' });
@@ -15,7 +19,7 @@ const goToLogin = () => {
     <div class="flex flex-col gap-4 items-center p-8">
       <div class="inline-flex items-center gap-4">
         <span class="text-oba-black font-roboto text-lg">Are you one of us?</span>
-        <UiBaseBtn @click="goToLogin" label-text="Join Us" button-type="button" class="px-8 py-2 bg-oba-blue hover:bg-opacity-75 active:bg-opacity-75 rounded-full border-none"
+        <UiLinkAsBtn :link-dest="{name: 'register'}" label-text="Join Us" class="px-8 py-2 bg-oba-blue hover:bg-opacity-75 active:bg-opacity-75 rounded-full border-none"
           text-style="text-oba-white text-lg font-roboto" />
       </div>
       <div class="inline-flex gap-4">

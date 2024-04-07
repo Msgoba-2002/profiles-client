@@ -10,10 +10,8 @@ const btnText = computed(() => {
   return 'Login';
 });
 
-const handleAuth = async () => {
-  if (isAuthenticated.value) {
-    await logout();
-  }
+const handleLogout = async () => {
+  await logout();
   return navigateTo({ name: 'login' });
 }
 </script>
@@ -24,8 +22,15 @@ const handleAuth = async () => {
     <NuxtLink :to="{name: 'index'}">
       <img src="/msgoba_2k2_logo.png" class="h-16 " alt="set logo">
     </NuxtLink>
-    <UiBaseBtn v-if="showButton" :label-text="btnText" button-type="button" class="px-8 py-2 bg-oba-red hover:bg-opacity-75 active:bg-opacity-75 rounded-full border-none"
-      text-style="text-oba-white text-lg font-roboto" @click="handleAuth">
+    <UiLinkAsBtn v-if="showButton && !isAuthenticated" :link-dest="{name: 'login'}" :label-text="btnText" class="px-8 py-2 bg-oba-red hover:bg-opacity-75 active:bg-opacity-75 rounded-full border-none"
+      text-style="text-oba-white text-lg font-roboto">
+      <template #prependIcon>
+        <Icon v-if="isAuthenticated" name="bytesize:sign-out" class="text-oba-white" size="16px" />
+        <Icon v-else name="bytesize:sign-in" class="text-oba-white" size="16px" />
+      </template>
+    </UiLinkAsBtn>
+    <UiBaseBtn v-if="showButton && isAuthenticated" button-type="button" :label-text="btnText" class="px-8 py-2 bg-oba-red hover:bg-opacity-75 active:bg-opacity-75 rounded-full border-none"
+      text-style="text-oba-white text-lg font-roboto" @click="handleLogout">
       <template #prependIcon>
         <Icon v-if="isAuthenticated" name="bytesize:sign-out" class="text-oba-white" size="16px" />
         <Icon v-else name="bytesize:sign-in" class="text-oba-white" size="16px" />
