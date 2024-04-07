@@ -119,7 +119,7 @@ const fileSelected = (event: any) => {
                 noFiles: 'hidden'
                 
               }" 
-              :validation="[['required'], ['acceptedImgFormat']]"
+              :validation="[['acceptedImgFormat']]"
               :validation-rules="{
                 acceptedImgFormat
               }"

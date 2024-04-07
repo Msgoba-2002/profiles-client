@@ -7,6 +7,7 @@ import type { CreateProfileRawForm } from '@/types/profile';
 import { classLevelOptions, classOptions, classArmOptions } from '@/constants/classes';
 import { fetchKeys } from '@/types/enums';
 import type { IProtoProfile } from '@/types/protoProfile';
+import { acceptedImgFormat, stringToArray } from '@/utils/validators';
 
 const { storeProfile } = useProfileStore();
 const { fetchUser } = useAuthStore();
@@ -104,7 +105,13 @@ const fileSelected = (event: any) => {
                 noFiles: 'hidden'
                 
               }" 
-              :validation="[['required']]"/>
+              :validation="[['required'], ['acceptedImgFormat']]"
+              :validation-rules="{
+                acceptedImgFormat
+              }"
+              :validation-messages="{
+                acceptedImgFormat: 'Image must be a .jpg, .jpeg, or .png file'
+              }"/>
             </div>
             <div class="w-[20%] self-center" v-if="photoPreview">
               <span class="block rounded-full w-12 h-12"
