@@ -28,7 +28,7 @@ const resendVerifyEmail = async () => {
   <section class="py-4">
     <div class="w-[70%] mx-auto bg-oba-red rounded-md">
       <div class="px-6 py-4">
-        <h1 class="font-roboto text-lg text-oba-white">Reset Password</h1>
+        <h1 class="font-roboto text-lg text-oba-white">Verify Email</h1>
       </div>
       <div class="rounded-md bg-oba-gray p-6">
         <div class="mb-4 font-roboto text-base font-light flex flex-col gap-4 text-center">
