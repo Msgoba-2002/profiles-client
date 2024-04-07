@@ -16,7 +16,7 @@ definePageMeta({
       <div class="rounded-md bg-oba-gray p-6">
         <Carousel :items-to-show="1" :wrap-around="true" :autoplay="5000" :transition="500" >
           <Slide v-for="num in 5" :key="'pic-' + num">
-            <ProfileCard />
+            <ProfileCard :id-prop="'pic-' + num" />
           </Slide>
 
           <template #addons>
