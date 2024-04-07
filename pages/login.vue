@@ -10,10 +10,14 @@ const { user } = storeToRefs(useUserStore());
 const submitLoginForm = () => {
   submitForm('login-form');
 }
+
+const isLoggingIn = ref(false);
 const handleLogin = async (body: { email: string; password: string; }) => {
   const { email, password } = body;
+  isLoggingIn.value = true;
   await emailLogin(email, password);
 
+  isLoggingIn.value = false;
   if (isAuthenticated.value && user.value) {
     const { id } = user.value;
     return navigateTo({ name: 'user-userId', params: { userId: id } });

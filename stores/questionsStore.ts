@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import type { CreateQuestionDto, IQuestion, UpdateQuestionDto, QuestionCreateResponse } from "@/types/question";
 import { fetchKeys } from "../types/enums";
+import { ref } from "vue";
+import { useApiFetch } from "@/composables/useApiFetch";
 
 export const useQuestionsStore = defineStore('questions', () => {
   const questions = ref<IQuestion[]>([]);

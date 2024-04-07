@@ -16,7 +16,9 @@ const { isAuthenticated } = storeToRefs(useAuthStore());
 const { user } = storeToRefs(useUserStore());
 const snackbar = useSnackbar();
 
+const isRegistering = ref(false);
 const handleRegister = async (form: UserRegistrationForm) => {
+  isRegistering.value = true;
   await registerUser(form);
   if (user.value) {
     snackbar.add({
@@ -28,6 +30,7 @@ const handleRegister = async (form: UserRegistrationForm) => {
       return navigateTo({ name: 'login' });
     }, 3000);
   }
+  isRegistering.value = false;
 }
 
 </script>
@@ -111,7 +114,11 @@ const handleRegister = async (form: UserRegistrationForm) => {
         </FormKit>
         <div class="my-4 flex flex-col gap-4">
           <UiBaseBtn @click="submitRegisterForm" label-text="Register" button-type="button" text-style="text-oba-white text-base font-roboto"
-            class="w-full bg-oba-blue rounded-md py-2" />
+            class="w-full bg-oba-blue rounded-md py-2" :is-disabled="isRegistering">
+            <template #appendIcon>
+              <Icon v-if="isRegistering" name="line-md:loading-alt-loop" size="16px" class="text-oba-white" />
+            </template>
+          </UiBaseBtn>
 
           <div class="flex flex-col items-center gap-2">
             <span class="text-oba-white text-sm font-roboto font-light">
