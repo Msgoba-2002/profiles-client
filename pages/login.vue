@@ -28,7 +28,7 @@ const handleLogin = async (body: { email: string; password: string; }) => {
 
 <template>
   <section class="py-4">
-    <div class="w-[70%] mx-auto bg-oba-gray rounded-t-md">
+    <div class="sm:w-[70%] w-full mx-auto bg-oba-gray rounded-t-md">
       <div class="px-6 py-4">
         <h1 class="font-roboto text-lg">Login</h1>
       </div>

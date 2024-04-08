@@ -35,7 +35,7 @@ const submitQuestionCreate = () => {
 
 <template>
   <section class="py-4">
-    <div class="w-[70%] mx-auto bg-oba-red rounded-md">
+    <div class="sm:w-[70%] w-full mx-auto bg-oba-red rounded-md">
       <div class="px-6 py-4">
         <h1 class="font-roboto text-lg text-oba-white">Create Eligibility Question</h1>
       </div>

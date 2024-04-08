@@ -10,7 +10,7 @@ const showEditProfile = computed(() => {
 
 <template>
   <section class="my-8">
-    <div class="w-[70%] mx-auto flex flex-row gap-4">
+    <div class="sm:w-[70%] w-full mx-auto flex flex-row gap-4">
       <div class="w-[20%]">
         <img :src="user?.Profile.profile_picture" class="w-20 object-cover aspect-square rounded-full" />
       </div>
