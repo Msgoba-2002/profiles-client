@@ -30,7 +30,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const emailLogin = async (email: string, password: string) => {
-    const { data, pending, error } = await useApiFetch('/auth/login', {
+    const { error } = await useApiFetch('/auth/login', {
       method: 'POST',
       key: fetchKeys.Login,
       body: JSON.stringify({ email, password }),
@@ -38,10 +38,10 @@ export const useAuthStore = defineStore('auth', () => {
         'Content-Type': 'application/json',
       }
     });
-    if (error.value) {
-      throw new Error(error.value.message);
+    if (!error.value) {
+      await fetchUser();
     }
-    await fetchUser();
+    return error.value;
   }
   
   const googleLogin = () => {
