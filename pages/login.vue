@@ -12,11 +12,19 @@ const submitLoginForm = () => {
 }
 
 const isLoggingIn = ref(false);
+const snackbar = useSnackbar();
 const handleLogin = async (body: { email: string; password: string; }) => {
   const { email, password } = body;
   isLoggingIn.value = true;
-  await emailLogin(email, password);
-
+  const error = await emailLogin(email, password);
+  
+  if (error && error.statusCode === 401) {
+    snackbar.add({
+      title: 'Invalid credentials',
+      text: 'Please check your email and password and try again.',
+      type: 'error',
+    });
+  }
   isLoggingIn.value = false;
   if (isAuthenticated.value && user.value) {
     const { id } = user.value;
