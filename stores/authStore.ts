@@ -111,11 +111,7 @@ export const useAuthStore = defineStore('auth', () => {
       body: JSON.stringify({ token }),
     });
 
-    if (error.value) {
-      throw new Error(error.value.message);
-    }
-
-    return data.value as EmailVerificationResponse;
+    return {data: data.value as EmailVerificationResponse, error: error.value};
   }
 
   const updatePassword = async (payload: PwResetDto) => {
