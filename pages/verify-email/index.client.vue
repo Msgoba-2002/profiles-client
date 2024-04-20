@@ -8,16 +8,32 @@ const route = useRoute();
 const { token } = route.query;
 const { user } = storeToRefs(useUserStore());
 
+const snackbar = useSnackbar();
 const runVerification = async () => {
   if (!token) return;
-  try {
-    const data = await verifyEmail(token as string);
-    if (data.statusCode === 200 && user.value) {
+
+  const { data, error } = await verifyEmail(token as string);
+  if (data && data.statusCode === 200) {
+    snackbar.add({
+      title: 'Success',
+      text: data.message,
+      type: 'success'
+    });
+    
+    if (user.value) {
       await fetchUser(true);
       return navigateTo({ name: 'user-userId', params: { userId: user.value.id } });
     }
-  } catch (err) {
-    console.error(err);
+    return navigateTo({ name: 'login' });
+  }
+  if (error && error.data.statusCode === 400) {
+    snackbar.add({
+      title: 'Error',
+      text: error.data.message,
+      type: 'error'
+    });
+
+    return navigateTo({ name: 'verify' });
   }
 }
 onMounted(() => {
