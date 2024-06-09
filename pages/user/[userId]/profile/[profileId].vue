@@ -18,7 +18,11 @@ const profileInfo = computed(() => {
     Nickname: userProfile.nickname,
     'Left From': userProfile.final_class,
     Email: userProfile.user.email,
-    Birthday: userProfile.birthday,
+    Birthday: new Date(userProfile.birthday).toLocaleDateString('en-NG', {
+      year: '2-digit',
+      month: 'short',
+      day: 'numeric',
+    }).split(' ').slice(0, 2).join('/'),
     'Marital Status': userProfile.marital_status,
     'Based In': userProfile.place_of_residence,
     'Employment Status': userProfile.occupation_status,
@@ -53,11 +57,11 @@ const profileInfo = computed(() => {
         <img :src="userProfile.profile_picture" alt="profile image" class="w-full aspect-square">
 
         <ul class="w-full list-none">
-          <li class="px-4 py-2 text-oba-black" v-for="(info, key, index) in profileInfo" :key="key"
+          <li class="px-4 py-2 text-oba-black h-fit" v-for="(info, key, index) in profileInfo" :key="key"
             :class="index % 2 > 0 ? 'bg-oba-blue text-oba-white': ''">
-            <div class="inline-flex items-center">
+            <div class="h-full">
               <span class="font-roboto text-base font-semibold">{{ key }}:</span>
-              <span class="font-roboto text-base ml-2 truncate">{{ info }}</span>
+              <p class="font-roboto text-base ml-2">{{ info }}</p>
             </div>
           </li>
         </ul>
