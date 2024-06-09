@@ -7,7 +7,11 @@ const { getUserProfile } = profileStore;
 const userProfile = await getUserProfile(profileId);
 
 const fullName = computed(() => `${userProfile.user.first_name} ${userProfile.user.last_name}`);
-const hasNickname = computed(() => !!userProfile.nickname);
+const hasNickname = computed(() => !!userProfile.nickname
+  && userProfile.nickname.toLowerCase() !== 'nil'
+  && userProfile.nickname.toLowerCase() !== 'none'
+  && userProfile.nickname.toLowerCase() !== 'n/a'
+);
 
 const profileInfo = computed(() => {
   const info = {
@@ -27,6 +31,9 @@ const profileInfo = computed(() => {
   Object.keys(info).forEach((key) => {
     if (!(info[key as keyof typeof info])) {
       delete info[key as keyof typeof info];
+    }
+    if (!hasNickname.value) {
+      delete info.Nickname;
     }
   });
 

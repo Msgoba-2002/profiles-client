@@ -15,7 +15,10 @@ const fullName = computed(() => {
 });
 
 const hasNickname = computed(() => {
-  return !!props.profileObj.Profile.nickname;
+  return !!props.profileObj.Profile.nickname
+    && props.profileObj.Profile.nickname.toLowerCase() !== 'nil'
+    && props.profileObj.Profile.nickname.toLowerCase() !== 'none'
+    && props.profileObj.Profile.nickname.toLowerCase() !== 'n/a';
 });
 </script>
 
