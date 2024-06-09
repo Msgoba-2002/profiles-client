@@ -5,6 +5,7 @@ type FetchOptions = {
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   body?: any;
   key: FetchKeys;
+  query?: Record<string, string | number>;
 }
 
 export const useApiFetch = async (url: string, options: FetchOptions) => {
