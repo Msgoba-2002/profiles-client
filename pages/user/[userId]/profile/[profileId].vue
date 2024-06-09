@@ -53,10 +53,12 @@ const profileInfo = computed(() => {
         <h1 class="font-roboto font-light text-lg text-oba-white capitalize">{{ fullName }}</h1>
       </div>
       
-      <div class="rounded-b-md bg-oba-gray">
-        <img :src="userProfile.profile_picture" alt="profile image" class="w-full aspect-square">
+      <div class="rounded-md bg-oba-gray">
+        <div class="w-full aspect-square">
+          <img :src="userProfile.profile_picture" alt="profile image" class="w-full object-cover">
+        </div>
 
-        <ul class="w-full list-none">
+        <ul class="w-full list-none pb-8">
           <li class="px-4 py-2 text-oba-black h-fit" v-for="(info, key, index) in profileInfo" :key="key"
             :class="index % 2 > 0 ? 'bg-oba-blue text-oba-white': ''">
             <div class="h-full">
