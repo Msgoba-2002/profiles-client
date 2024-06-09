@@ -43,3 +43,35 @@ export interface IFullProfile extends IProfileDto {
   id: string;
   user_id: string;
 }
+
+export interface IRandomProfile {
+  id: string;
+  first_name: string;
+  last_name: string;
+  Profile: {
+    id: string;
+    profile_picture: string;
+    nickname?: string;
+  }
+}
+
+export interface ILimitedProfile {
+  user: {
+    id: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+  }
+  id: string;
+  bio: string;
+  birthday: string;
+  final_class: string;
+  hobbies: string[];
+  marital_status: string;
+  nickname?: string;
+  occupation?: string;
+  occupation_status: string;
+  place_of_work?: string;
+  place_of_residence: string;
+  profile_picture: string;
+}

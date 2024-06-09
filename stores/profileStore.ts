@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import type { IFullProfile, IProfileDto, IProfileUpdateDto, IUploadUrl } from '../types/profile';
+import type { IFullProfile, IProfileDto, IProfileUpdateDto, IUploadUrl, IRandomProfile, ILimitedProfile } from '../types/profile';
 import { fetchKeys } from '../types/enums';
 
 export const useProfileStore = defineStore('profiles', () => {
@@ -61,10 +61,37 @@ export const useProfileStore = defineStore('profiles', () => {
     }
   }
 
+  const getRandomProfiles = async (count: number) => {
+    const { data, error } = await useApiFetch('/profile', {
+      method: 'GET',
+      key: fetchKeys.GetRandomProfiles,
+      query: { count: count },
+    });
+
+    if (error.value) {
+      throw new Error(error.value.message);
+    }
+    return data.value as Record<'profiles', IRandomProfile[]>;
+  }
+
+  const getUserProfile = async (profileId: string) => {
+    const { data, error } = await useApiFetch(`/profile/${profileId}`, {
+      method: 'GET',
+      key: fetchKeys.GetUserProfile,
+    });
+
+    if (error.value) {
+      throw new Error(error.value.message);
+    }
+    return data.value as ILimitedProfile;
+  }
+
   return {
     getUploadUrl,
     storeProfile,
     deletePicture,
     updateProfile,
+    getRandomProfiles,
+    getUserProfile,
   }
 });
