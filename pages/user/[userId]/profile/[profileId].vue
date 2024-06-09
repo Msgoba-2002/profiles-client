@@ -50,7 +50,7 @@ const profileInfo = computed(() => {
   <section class="py-4">
     <div class="sm:w-[70%] w-full mx-auto bg-oba-red rounded-md">
       <div class="px-6 py-4">
-        <h1 class="font-roboto font-light text-lg text-oba-white">{{ fullName }}</h1>
+        <h1 class="font-roboto font-light text-lg text-oba-white capitalize">{{ fullName }}</h1>
       </div>
       
       <div class="rounded-b-md bg-oba-gray">
