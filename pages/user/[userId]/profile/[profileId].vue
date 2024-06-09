@@ -54,8 +54,8 @@ const profileInfo = computed(() => {
       </div>
       
       <div class="rounded-md bg-oba-gray">
-        <div class="w-full aspect-square">
-          <img :src="userProfile.profile_picture" alt="profile image" class="w-full object-cover">
+        <div class="w-full rounded-t-md">
+          <img :src="userProfile.profile_picture" alt="profile image" class="w-full object-cover rounded-t-md">
         </div>
 
         <ul class="w-full list-none pb-8">
