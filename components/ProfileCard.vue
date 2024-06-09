@@ -23,7 +23,7 @@ const hasNickname = computed(() => {
 <template>
   <NuxtLink :to="{ name: 'user-userId-profile-profileId', params: { userId: user?.id as string, profileId: props.profileObj.Profile.id } }"
     class="w-56 h-96 rounded-md flex flex-col gap-0 bg-oba-blue justify-between hover:opacity-85" :key="idProp">
-    <div class="w-full h-full bg-oba-white">
+    <div class="w-full h-80 bg-oba-white">
       <img :src="profileObj.Profile.profile_picture" alt="profile-pic" class="w-full h-full object-cover rounded-t-md" />
     </div>
     <div class="w-full h-16 bg-oba-red rounded-b-md p-2">
