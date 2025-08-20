@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+
 definePageMeta({
   middleware: ['guest-only'],
   layout: 'auth-layout',
 });
 const { isAuthenticated } = storeToRefs(useAuthStore());
-const { googleLogin, emailLogin } = useAuthStore();
+const { updateAuthState, emailLogin } = useAuthStore();
 const { user } = storeToRefs(useUserStore());
 
 const submitLoginForm = () => {
@@ -29,6 +31,26 @@ const handleLogin = async (body: { email: string; password: string; }) => {
   if (isAuthenticated.value && user.value) {
     const { id } = user.value;
     return navigateTo({ name: 'user-userId', params: { userId: id } });
+  }
+}
+
+const auth = useFirebaseAuth();
+const handleFirebaseLogin = () => {
+  const provider = new GoogleAuthProvider();
+  provider.addScope('email');
+  if (!auth) {
+    console.error('Firebase auth is not initialized');
+  } else {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential?.accessToken;
+        const user = result.user;
+        updateAuthState(true);
+        debugger;
+      }).catch((error) => {
+        debugger;
+      });
   }
 }
 </script>
@@ -78,7 +100,7 @@ const handleLogin = async (body: { email: string; password: string; }) => {
 
           <span class="text-lg font-roboto capitalize text-oba-white font-light text-center">-OR-</span>
             
-          <UiBaseBtn @click="googleLogin" label-text="Continue with Google" button-type="button" text-style="text-oba-black text-base font-roboto"
+          <UiBaseBtn @click="handleFirebaseLogin" label-text="Continue with Google" button-type="button" text-style="text-oba-black text-base font-roboto"
             class="w-full bg-oba-gray rounded-md py-2" />
           
           <div class="flex flex-col items-center gap-2">
@@ -92,4 +114,4 @@ const handleLogin = async (body: { email: string; password: string; }) => {
       </div>
     </div>
   </section>
-</template>~/stores/useUserStore
+</template>

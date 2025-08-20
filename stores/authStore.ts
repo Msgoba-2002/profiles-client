@@ -6,6 +6,7 @@ import { useUserStore } from './userStore';
 import { useApiFetch } from "@/composables/useApiFetch";
 import type { EmailVerificationResponse } from "../types/verification";
 import type { PwResetDto, PwUpdateResponse } from "../types/password";
+import { signOut } from "firebase/auth";
 
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref(false);
@@ -50,16 +51,16 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const logout = async () => {
-    const { error } = await useApiFetch('/auth/logout', {
-      method: 'POST',
-      key: fetchKeys.Logout,
-    });
-    if (error.value) {
-      throw new Error(error.value.message);
-    }
     const userStore = useUserStore();
-    updateAuthState(false);
-    userStore.setUser(null);
+    const auth = useFirebaseAuth();
+    if (!auth) return;
+    signOut(auth).then(() => {
+      debugger;
+      updateAuthState(false);
+      userStore.setUser(null);
+    }).catch((error) => {
+      debugger;
+    });
   }
 
   const registerUser = async (credentials: UserRegistrationForm) => {

@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     'nuxt-snackbar',
     'vue3-carousel-nuxt',
     '@nuxt/test-utils/module',
+    'nuxt-vuefire'
   ],
   snackbar: {
     top: true,
@@ -28,9 +29,24 @@ export default defineNuxtConfig({
     public: {
       backendUrl: '',
       apiDockerUrl: '',
+      firebaseApiKey: '',
+      firebaseAuthDomain: '',
+      firebaseProjectId: '',
+      firebaseAppId: '',
     }
   },
   experimental: {
     typedPages: true,
+  },
+  vuefire: {
+    auth: {
+      enabled: true,
+    },
+    config: {
+      apiKey: process.env.NUXT_PUBLIC_FIREBASE_API_KEY || '',
+      authDomain: process.env.NUXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '',
+      projectId: process.env.NUXT_PUBLIC_FIREBASE_PROJECT_ID || '',
+      appId: process.env.NUXT_PUBLIC_FIREBASE_APP_ID || '',
+    }
   }
 })
