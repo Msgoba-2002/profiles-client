@@ -1,56 +1,53 @@
 <script setup lang="ts">
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword } from 'firebase/auth';
 
 definePageMeta({
   middleware: ['guest-only'],
   layout: 'auth-layout',
 });
 const { isAuthenticated } = storeToRefs(useAuthStore());
-const { updateAuthState, emailLogin } = useAuthStore();
 const { user } = storeToRefs(useUserStore());
+const { googleLogin, emailLogin } = useAuthStore();
 
 const submitLoginForm = () => {
   submitForm('login-form');
 }
 
-const isLoggingIn = ref(false);
 const snackbar = useSnackbar();
-const handleLogin = async (body: { email: string; password: string; }) => {
-  const { email, password } = body;
-  isLoggingIn.value = true;
-  const error = await emailLogin(email, password);
-  
-  if (error && error.statusCode === 401) {
-    snackbar.add({
-      title: 'Invalid credentials',
-      text: 'Please check your email and password and try again.',
+
+const handleGoogleLogin = async () => {
+  const result = await googleLogin();
+  if (result) {
+    const { success } = result;
+    if (success) {
+      if (user.value?.id) {
+        return navigateTo({ name: 'user-userId', params: { userId: user.value?.id } });
+      }
+    } else {
+      snackbar.add({
+      title: 'Login Failed',
+      text: `Error: ${result.error}`,
       type: 'error',
-    });
-  }
-  isLoggingIn.value = false;
-  if (isAuthenticated.value && user.value) {
-    const { id } = user.value;
-    return navigateTo({ name: 'user-userId', params: { userId: id } });
+      });
+    }
   }
 }
 
-const auth = useFirebaseAuth();
-const handleFirebaseLogin = () => {
-  const provider = new GoogleAuthProvider();
-  provider.addScope('email');
-  if (!auth) {
-    console.error('Firebase auth is not initialized');
-  } else {
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential?.accessToken;
-        const user = result.user;
-        updateAuthState(true);
-        debugger;
-      }).catch((error) => {
-        debugger;
+const handleEmailLogin = async (body: { email: string; password: string; }) => {
+  const result = await emailLogin(body.email, body.password);
+  if (result) {
+    const { success } = result;
+    if (success) {
+      if (user.value?.id) {
+        return navigateTo({ name: 'user-userId', params: { userId: user.value?.id } });
+      }
+    } else {
+      snackbar.add({
+      title: 'Login Failed',
+      text: `Error: ${result.error}`,
+      type: 'error',
       });
+    }
   }
 }
 </script>
@@ -63,7 +60,7 @@ const handleFirebaseLogin = () => {
         <h1 class="font-roboto text-lg">Login</h1>
       </div>
       <div class="rounded-md bg-oba-red p-6">
-        <FormKit type="form" id="login-form" @submit="handleLogin" submit-label="Login"
+        <FormKit type="form" id="login-form" @submit="handleEmailLogin" submit-label="Login"
           :classes="{
             form: 'flex flex-col gap-6',
           }"
@@ -100,7 +97,7 @@ const handleFirebaseLogin = () => {
 
           <span class="text-lg font-roboto capitalize text-oba-white font-light text-center">-OR-</span>
             
-          <UiBaseBtn @click="handleFirebaseLogin" label-text="Continue with Google" button-type="button" text-style="text-oba-black text-base font-roboto"
+          <UiBaseBtn @click="handleGoogleLogin" label-text="Continue with Google" button-type="button" text-style="text-oba-black text-base font-roboto"
             class="w-full bg-oba-gray rounded-md py-2" />
           
           <div class="flex flex-col items-center gap-2">

@@ -11,26 +11,43 @@ const submitRegisterForm = () => {
   submitForm('register-form');
 }
 
-const { googleLogin, registerUser } = useAuthStore();
-const { isAuthenticated } = storeToRefs(useAuthStore());
+const { googleLogin, emailRegistration } = useAuthStore();
 const { user } = storeToRefs(useUserStore());
 const snackbar = useSnackbar();
 
 const isRegistering = ref(false);
 const handleRegister = async (form: UserRegistrationForm) => {
   isRegistering.value = true;
-  await registerUser(form);
+  await emailRegistration(form);
   if (user.value) {
+    setTimeout(() => {
+      return navigateTo({ name: 'user-userId', params: { userId: (user.value)!.id } });
+    }, 3000);
     snackbar.add({
       title: 'Registration Successful',
-      text: `${user.value?.first_name}, your account has been created successfully. Please login to continue.`,
+      text: `${user.value?.first_name}, your account has been created successfully.`,
       type: 'success',
     });
-    setTimeout(() => {
-      return navigateTo({ name: 'login' });
-    }, 3000);
   }
   isRegistering.value = false;
+}
+
+const handleGoogleLogin = async () => {
+  const result = await googleLogin();
+  if (result) {
+    const { success } = result;
+    if (success) {
+      if (user.value?.id) {
+        return navigateTo({ name: 'user-userId', params: { userId: user.value?.id } });
+      }
+    } else {
+      snackbar.add({
+      title: 'Login Failed',
+      text: `Error: ${result.error}`,
+      type: 'error',
+      });
+    }
+  }
 }
 
 </script>
@@ -42,7 +59,7 @@ const handleRegister = async (form: UserRegistrationForm) => {
       <div class="px-6 py-4 flex flex-col gap-4">
         <h1 class="font-roboto text-lg">Register</h1>
 
-        <UiBaseBtn @click="googleLogin" label-text="Continue with Google" button-type="button" text-style="text-oba-white text-base font-roboto"
+        <UiBaseBtn @click="handleGoogleLogin" label-text="Continue with Google" button-type="button" text-style="text-oba-white text-base font-roboto"
           class="w-full bg-oba-blue rounded-md py-2" />
         
           <span class="text-lg font-roboto capitalize text-oba-black font-light text-center">-OR-</span>
