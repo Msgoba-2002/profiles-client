@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword } from 'firebase/auth';
-
 definePageMeta({
   middleware: ['guest-only'],
   layout: 'auth-layout',

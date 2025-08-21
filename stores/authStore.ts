@@ -1,11 +1,9 @@
 import { fetchKeys } from "@/types/enums";
-import type { AuthenticatedUser, FetchedAuthenticatedUser, FirebaseAuthenticatedUser, NewlyRegisteredUser, UserRegistrationForm } from "../types/user";
+import type { UserRegistrationForm } from "../types/user";
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import { useUserStore } from './userStore';
 import { useApiFetch } from "@/composables/useApiFetch";
-import type { EmailVerificationResponse } from "../types/verification";
-import type { PwResetDto, PwUpdateResponse } from "../types/password";
 import {
   GoogleAuthProvider,
   signInWithPopup,
@@ -17,6 +15,7 @@ import {
   browserLocalPersistence,
   type User,
   sendPasswordResetEmail,
+  deleteUser,
 } from "firebase/auth";
 
 export const useAuthStore = defineStore('auth', () => {
@@ -121,6 +120,23 @@ export const useAuthStore = defineStore('auth', () => {
     return await sendEmailVerification(user);
   }
 
+  const deleteAccount = async () => {
+    const user = await getCurrentUser();
+    if (user) {
+      try {
+        await deleteUser(user);
+        return { success: true, error: null };
+      } catch (error: any) {
+        if (error.code === 'auth/requires-recent-login') {
+          // User needs to reauthenticate before deleting account
+          return { success: false, error: 'Please login again, then retry this action.' };
+        }
+        console.error('Error during account deletion:', error);
+        return { success: false, error: 'Account deletion failed' };
+      }
+    }
+  }
+
   return {
     fetchUser,
     updateAuthState,
@@ -131,5 +147,6 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
     requestPwReset,
     sendVerificationEmail,
+    deleteAccount,
   }
 });

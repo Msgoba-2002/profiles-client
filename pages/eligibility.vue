@@ -50,7 +50,7 @@ const handleEligibilityCheck = async (form: Record<string, string>) => {
       text: eligibilityResponse.message,
       type: 'success',
     });
-    await fetchUser(true);
+    await fetchUser();
     if (user.value) {
       return navigateTo({ name: 'user-userId', params: { userId: user.value.id } });
     }
@@ -60,6 +60,30 @@ const handleEligibilityCheck = async (form: Record<string, string>) => {
       text: eligibilityResponse.message,
       type: 'error',
     });
+  }
+}
+
+const handleDeleteAcct = async () => {
+  const authStore = useAuthStore();
+  const result = await authStore.deleteAccount();
+  if (result) {
+    const { success } = result;
+    if (success) {
+      snackbar.add({
+        title: 'Success',
+        text: 'Account deleted successfully',
+        type: 'success',
+      });
+      setTimeout(() => {
+        navigateTo({ name: 'index' });
+      }, 3000);
+    } else {
+      snackbar.add({
+        title: 'Error',
+        text: `Error: ${result.error}`,
+        type: 'error',
+      });
+    }
   }
 }
 </script>
@@ -101,6 +125,11 @@ const handleEligibilityCheck = async (form: Record<string, string>) => {
             <Icon v-if="isChecking" name="line-md:loading-alt-loop" size="16px" class="text-oba-white" />
           </template>
         </UiBaseBtn>
+        <div class="my-8">
+          <p class="text-center">Created an account by mistake?</p>
+          <UiBaseBtn @click="handleDeleteAcct" label-text="Delete Account" button-type="button" text-style="text-oba-blue text-base font-roboto"
+            class="w-full border-2 border-oba-blue rounded-md py-2" />
+        </div>
       </div>
     </div>
   </section>

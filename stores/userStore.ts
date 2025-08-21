@@ -34,5 +34,6 @@ export const useUserStore = defineStore('user', () => {
     setUser,
     userRefresh,
     setAccessToken,
+    accessToken,
   }
 });
