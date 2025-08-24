@@ -4,21 +4,25 @@ definePageMeta({
   layout: 'auth-layout',
 });
 
-const { resendVerificationEmail } = useAuthStore();
+const { sendVerificationEmail } = useAuthStore();
+const auth = useFirebaseAuth();
 const snackbar = useSnackbar();
 const resendVerifyEmail = async () => {
+  if (!auth?.currentUser) return;
   try {
-    const data = await resendVerificationEmail();
-    if (data.statusCode === 200) {
-      snackbar.add({
-        title: 'Email sent',
-        text: 'We\'ve resent the email with instructions to verify your email address.',
-        type: 'success',
-      });
-    }
+    await sendVerificationEmail(auth.currentUser);
+    snackbar.add({
+      title: 'Email sent',
+      text: 'We\'ve resent the email with instructions to verify your email address.',
+      type: 'success',
+    });
   } catch (error) {
     console.log(error);
-  
+    snackbar.add({
+      title: 'Error',
+      text: 'Failed to resend verification email.',
+      type: 'error',
+    });
   }
 }
 </script>

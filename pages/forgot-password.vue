@@ -11,17 +11,19 @@ const submitPwReqForm = () => {
 const { requestPwReset } = useAuthStore();
 const snackbar = useSnackbar();
 const handlePwResetReq = async (form: { email: string; }) => {
-  try {
-    const data = await requestPwReset({ email: form.email });
-    if (data.statusCode = 200) {
-      snackbar.add({
-        title: 'Email sent',
-        text: 'Check your email for instructions to reset your password',
-        type: 'success',
-      });
-    }
-  } catch (error) {
-    console.log(error);
+  const data = await requestPwReset({ email: form.email });
+  if (data.success) {
+    snackbar.add({
+      title: 'Email sent',
+      text: 'Check your email for instructions to reset your password',
+      type: 'success',
+    });
+  } else {
+    snackbar.add({
+      title: 'Error',
+      text: data.error,
+      type: 'error'
+    });
   }
 }
 </script>

@@ -10,6 +10,15 @@ export interface AuthenticatedUser {
   Profile: IFullProfile;
 }
 
+export interface FirebaseAuthenticatedUser {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  emailVerified: boolean;
+  photoURL: string | null;
+  questionsVerified: boolean;
+}
+
 export interface FetchedAuthenticatedUser {
   user: AuthenticatedUser;
 }
