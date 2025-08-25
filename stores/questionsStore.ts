@@ -8,7 +8,7 @@ export const useQuestionsStore = defineStore('questions', () => {
   const questions = ref<IQuestion[]>([]);
 
   const addQuestion = async (dto: CreateQuestionDto) => {
-    const { data, error } = await useApiFetch('/questions', {
+    const { data, error } = await useApiFetch('/question/', {
       method: 'POST',
       key: fetchKeys.AddQuestion,
       body: JSON.stringify(dto),
@@ -21,7 +21,7 @@ export const useQuestionsStore = defineStore('questions', () => {
   }
 
   const updateQuestion = async (dto: UpdateQuestionDto, id: string) => {
-    const { data, error } = await useApiFetch(`/questions/${id}`, {
+    const { data, error } = await useApiFetch(`/question/${id}`, {
       method: 'PATCH',
       key: fetchKeys.UpdateQuestion,
       body: JSON.stringify(dto),
@@ -33,7 +33,7 @@ export const useQuestionsStore = defineStore('questions', () => {
   }
 
   const fetchQuestions = async () => {
-    const { data, error } = await useApiFetch('/questions', {
+    const { data, error } = await useApiFetch('/question/', {
       method: 'GET',
       key: fetchKeys.GetQuestions,
     });
@@ -46,7 +46,7 @@ export const useQuestionsStore = defineStore('questions', () => {
   }
 
   const deleteQuestion = async (id: string) => {
-    const { error } = await useApiFetch(`/questions/${id}`, {
+    const { error } = await useApiFetch(`/question/${id}`, {
       method: 'DELETE',
       key: fetchKeys.DeleteQuestion,
     });

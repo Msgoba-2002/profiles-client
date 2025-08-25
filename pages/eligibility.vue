@@ -27,19 +27,27 @@ const handleEligibilityCheck = async (form: Record<string, string>) => {
   Object.keys(form).forEach((key) => {
     const relevantQuestion = questions.value.find((question) => question.id === key);
     const answer = relevantQuestion?.options.findIndex((option) => option === form[key]);
-    dto.push({ question_id: key, provided_answer: answer as number });
+    dto.push({ questionId: key, providedAnswer: answer as number });
   });
-  const { data, error, pending } = await useApiFetch('/questions/answers', {
+  const { data, error, pending } = await useApiFetch('/question/answers', {
     method: 'POST',
-    body: JSON.stringify(dto),
+    body: JSON.stringify({ answers: dto }),
     key: fetchKeys.CheckEligibility,
   });
   if (error.value) {
-    snackbar.add({
-      title: 'Error',
-      text: error.value.message,
-      type: 'error',
-    });
+    if (error.value.statusCode === 400 && error.value.data) {
+      snackbar.add({
+        title: 'Verification Failed',
+        text: error.value.data.message,
+        type: 'error'
+      });
+    } else {
+      snackbar.add({
+        title: 'Error',
+        text: error.value.message,
+        type: 'error',
+      });
+    }
   }
 
   isChecking.value = pending.value;

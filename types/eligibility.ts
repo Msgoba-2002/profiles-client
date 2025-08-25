@@ -4,6 +4,6 @@ export interface EligibilityResponse {
 }
 
 export interface EligibilityAnswer {
-  question_id: string;
-  provided_answer: number;
+  questionId: string;
+  providedAnswer: number;
 }

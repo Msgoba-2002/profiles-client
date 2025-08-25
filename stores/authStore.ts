@@ -28,10 +28,12 @@ export const useAuthStore = defineStore('auth', () => {
   const fetchUser = async () => {
     const currentUser = await getCurrentUser();
     if (currentUser) {
+      const accessToken = await currentUser.getIdTokenResult(true);
       // Check if user has passed the questions
       // If not questions verified, redirect to that page
       // If questions verified, set the relevant property on the user object
       userStore.setUser({ ...currentUser, questionsVerified: false });
+      userStore.setAccessToken(accessToken.token);
       // Fetch user profile and attach to user object
       // If no profile found, redirect to profile creation page
       // 
