@@ -19,6 +19,7 @@ export const fetchKeys = {
   CheckEligibility: 'CheckEligibility',
   GetProtoProfile: 'GetProtoProfile',
   GetRandomProfiles: 'GetRandomProfiles',
+  GetQuestionsVerified: 'GetQuestionsVerified',
 } as const;
 
 export type FetchKeys = keyof typeof fetchKeys;

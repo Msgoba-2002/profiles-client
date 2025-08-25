@@ -7,6 +7,8 @@ export interface AuthenticatedUser {
   last_name: string;
   email_verified: boolean;
   questions_verified: boolean;
+  is_admin: boolean;
+  is_super_admin: boolean;
   Profile: IFullProfile;
 }
 
@@ -17,6 +19,8 @@ export interface FirebaseAuthenticatedUser {
   emailVerified: boolean;
   photoURL: string | null;
   questionsVerified: boolean;
+  isAdmin: boolean;
+  isSuperAdmin: boolean;
 }
 
 export interface FetchedAuthenticatedUser {

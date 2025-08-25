@@ -20,7 +20,9 @@ export const useUserStore = defineStore('user', () => {
       email_verified: newUser?.emailVerified || false,
       first_name: splitName.shift() || '',
       last_name: splitName.pop() || '',
-      questions_verified: false, // Default value, adjust as needed
+      questions_verified: newUser?.questionsVerified || false,
+      is_admin: newUser?.isAdmin || false,
+      is_super_admin: newUser?.isSuperAdmin || false,
       Profile: {},
     };
   }

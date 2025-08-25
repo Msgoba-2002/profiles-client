@@ -23,15 +23,24 @@ export const useAuthStore = defineStore('auth', () => {
 
   const auth = useFirebaseAuth();
   const userStore = useUserStore();
+  const questionsStore = useQuestionsStore();
   auth?.setPersistence(browserLocalPersistence);
   
   const fetchUser = async () => {
     const currentUser = await getCurrentUser();
     if (currentUser) {
+      const accessToken = await currentUser.getIdTokenResult();
       // Check if user has passed the questions
-      // If not questions verified, redirect to that page
-      // If questions verified, set the relevant property on the user object
-      userStore.setUser({ ...currentUser, questionsVerified: false });
+      const result = await checkQuestionsVerified(accessToken.token);
+      const { success: questionsVerified } = result as { message: string; success: boolean; };
+
+      userStore.setUser({
+        ...currentUser,
+        questionsVerified,
+        isAdmin: accessToken.claims.admin || false,
+        isSuperAdmin: accessToken.claims.superAdmin || false
+      });
+      userStore.setAccessToken(accessToken.token);
       // Fetch user profile and attach to user object
       // If no profile found, redirect to profile creation page
       // 
@@ -135,6 +144,22 @@ export const useAuthStore = defineStore('auth', () => {
         return { success: false, error: 'Account deletion failed' };
       }
     }
+  }
+
+  const checkQuestionsVerified = async (token: string) => {
+    const { data, error } = await useApiFetch('/question/verified', {
+      method: 'GET',
+      key: fetchKeys.GetQuestionsVerified,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (error.value) {
+      throw new Error(error.value.message);
+    }
+
+    return data.value;
   }
 
   return {
