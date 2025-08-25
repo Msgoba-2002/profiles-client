@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  middleware: ['is-authenticated', 'is-verified', 'has-profile', 'is-admin'],
+  middleware: ['is-authenticated', 'is-verified', 'is-eligible', 'has-profile', 'is-admin'],
 });
 
 const { fetchQuestions, deleteQuestion } = useQuestionsStore();
