@@ -1,7 +1,7 @@
 export interface CreateQuestionDto {
   question: string;
   options: string[];
-  correct_option: number;
+  correctOption: number;
 }
 
 export interface UpdateQuestionDto extends Partial<CreateQuestionDto> { }
@@ -20,8 +20,9 @@ export interface IQuestion {
   id: string;
   question: string;
   options: string[];
+  correctOption?: number;
 }
 
 export interface QuestionCreateResponse extends IQuestion {
-  correct_option: number;
+  correctOption: number;
 }

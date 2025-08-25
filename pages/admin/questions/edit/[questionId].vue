@@ -4,6 +4,7 @@ definePageMeta({
 });
 
 import type { UpdateQuestionForm } from '@/types/question';
+import { fetchKeys } from '~/types/enums';
 
 const answerOptions = [
   { value: 0, label: 'A' },
@@ -12,7 +13,7 @@ const answerOptions = [
 ];
 
 const { updateQuestion, fetchQuestions } = useQuestionsStore();
-await fetchQuestions();
+await fetchQuestions(true);
 
 const savingQuestion = ref(false);
 const route = useRoute();
@@ -27,11 +28,16 @@ const handleUpdateQuestion = async (form: UpdateQuestionForm) => {
   const dto = {
     question: form.question,
     options: [form.option_a, form.option_b, form.option_c],
-    correct_option: form.correct_answer,
+    correctOption: form.correct_answer,
   }
 
-  await updateQuestion(dto, qId);
+  const { success } = await updateQuestion(dto, qId);
   savingQuestion.value = false;
+
+  if (success) {
+    refreshNuxtData(fetchKeys.GetQuestions);
+    navigateTo({ name: 'admin-questions' });
+  }
 }
 
 const submitQuestionEdit = () => {

@@ -37,6 +37,7 @@ export default defineNuxtConfig({
   },
   experimental: {
     typedPages: true,
+    asyncContext: true,
   },
   vuefire: {
     auth: {

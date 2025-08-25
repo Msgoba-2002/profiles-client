@@ -4,7 +4,7 @@ definePageMeta({
 });
 
 const { fetchQuestions, deleteQuestion } = useQuestionsStore();
-await fetchQuestions();
+await fetchQuestions(true);
 const { questions } = storeToRefs(useQuestionsStore());
 
 const delQues = async (id: string) => {

@@ -13,6 +13,7 @@ export const useQuestionsStore = defineStore('questions', () => {
       key: fetchKeys.AddQuestion,
       body: JSON.stringify(dto),
     });
+
     if (error.value) {
       throw new Error(error.value.message);
     }
@@ -29,11 +30,15 @@ export const useQuestionsStore = defineStore('questions', () => {
     if (error.value) {
       throw new Error(error.value.message);
     }
-    console.log(data.value);
+    return { success: true };
   }
 
-  const fetchQuestions = async () => {
-    const { data, error } = await useApiFetch('/question/', {
+  const fetchQuestions = async (forAdmin = false) => {
+    let url = '/question/';
+    if (forAdmin) {
+      url += 'admin'
+    }
+    const { data, error } = await useApiFetch(url, {
       method: 'GET',
       key: fetchKeys.GetQuestions,
     });

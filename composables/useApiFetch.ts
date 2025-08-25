@@ -20,7 +20,7 @@ export const useApiFetch = async (url: string, options: FetchOptions) => {
     options.headers = {
       ...options.headers,
       ...useRequestHeaders(['cookie']),
-      Authorization: `Bearer ${accessToken.value}`,
+      Authorization: options.headers?.Authorization || `Bearer ${accessToken.value}`,
     }
   }
 
@@ -31,7 +31,7 @@ export const useApiFetch = async (url: string, options: FetchOptions) => {
     headers: {
       'Accept': 'application/json',
       ...options.headers,
-      Authorization: `Bearer ${accessToken.value}`,
+      Authorization: options.headers?.Authorization || `Bearer ${accessToken.value}`,
     }
   });
 }

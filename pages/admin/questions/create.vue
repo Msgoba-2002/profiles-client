@@ -18,7 +18,7 @@ const handleCreateQuestion = async (form: CreateQuestionForm) => {
   const dto = {
     question: form.question,
     options: [form.option_a, form.option_b, form.option_c],
-    correct_option: form.correct_answer,
+    correctOption: form.correct_answer,
   }
 
   await addQuestion(dto);
