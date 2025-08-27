@@ -1,14 +1,41 @@
 <script setup lang="ts">
+import { fetchKeys } from '~/types/enums';
+import type { IQuestion } from '~/types/question';
+
 definePageMeta({
   middleware: ['is-authenticated', 'is-verified', 'is-eligible', 'has-profile', 'is-admin'],
 });
 
-const { fetchQuestions, deleteQuestion } = useQuestionsStore();
-await fetchQuestions(true);
-const { questions } = storeToRefs(useQuestionsStore());
+const snackbar = useSnackbar();
 
-const delQues = async (id: string) => {
-  await deleteQuestion(id);
+const { error } = await useApiFetch('/question/admin', {
+  method: 'GET',
+  key: fetchKeys.AdminGetQuestions,
+});
+
+if (error.value) {
+  snackbar.add({
+    title: 'Error',
+    text: error.value.message,
+    type: 'error',
+  });
+}
+
+const { data: questions } = useNuxtData<IQuestion[]>(fetchKeys.AdminGetQuestions);
+
+const deleteQuestion = async (id: string) => {
+  const { error } = await useApiFetch(`/question/${id}`, {
+    method: 'DELETE',
+    key: fetchKeys.DeleteQuestion,
+  });
+  if (error.value) {
+    snackbar.add({
+      title: 'Error',
+      text: error.value.message,
+      type: 'error',
+    });
+  }
+  refreshNuxtData(fetchKeys.AdminGetQuestions);
 }
 </script>
 
@@ -29,7 +56,7 @@ const delQues = async (id: string) => {
               <div class="flex flex-row gap-4">
                 <Icon @click="() => navigateTo({name: 'admin-questions-edit-questionId', params: { questionId: question.id}})"
                   name="mdi:pencil" size="16px" class="text-oba-black hover:scale-105 cursor-pointer" />
-                <Icon @click="() => delQues(question.id)"
+                <Icon @click="() => deleteQuestion(question.id)"
                   name="mdi:delete" size="16px" class="text-oba-black hover:scale-105 cursor-pointer" />
               </div>
             </span>

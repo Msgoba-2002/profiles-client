@@ -23,7 +23,6 @@ export const useAuthStore = defineStore('auth', () => {
 
   const auth = useFirebaseAuth();
   const userStore = useUserStore();
-  const questionsStore = useQuestionsStore();
   auth?.setPersistence(browserLocalPersistence);
   
   const fetchUser = async () => {

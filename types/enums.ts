@@ -13,6 +13,8 @@ export const fetchKeys = {
   UpdateProfile: 'UpdateProfile',
   DeleteImage: 'DeleteImage',
   GetQuestions: 'GetQuestions',
+  AdminGetQuestions: 'AdminGetQuestions',
+  AdminGetQuestion: 'AdminGetQuestion',
   AddQuestion: 'AddQuestion',
   UpdateQuestion: 'UpdateQuestion',
   DeleteQuestion: 'DeleteQuestion',
