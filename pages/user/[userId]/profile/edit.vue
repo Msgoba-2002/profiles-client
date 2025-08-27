@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { classOptions, classLevelOptions, classArmOptions } from '@/constants/classes';
-import type { CreateProfileRawForm, IFullProfile, IProfileUpdateDto } from '@/types/profile';
+import type { CreateProfileRawForm, IFullProfile, IProfileDto, IProfileUpdateDto } from '@/types/profile';
 import { stringToArray, acceptedImgFormat } from '@/utils/validators';
 import { fetchKeys } from '~/types/enums';
 
@@ -36,9 +36,14 @@ const handleProfileEdit = async (form: CreateProfileRawForm) => {
     const profilePic = form.profile_picture[0];
     if (profilePic && profile.value?.profilePictureUrl) {
       // delete old picture from s3
-      const { error } = await useApiFetch(`/storage/delete?path=${profile.value.profilePictureUrl}`, {
+      const picKey = new URL(profile.value.profilePictureUrl).pathname.substring(1); // remove leading /
+
+      const { error } = await useApiFetch(`/storage/delete`, {
         method: 'DELETE',
         key: fetchKeys.DeleteImage,
+        query: {
+          path: picKey
+        }
       });
       if (error.value) {
         snackbar.add({
@@ -46,15 +51,16 @@ const handleProfileEdit = async (form: CreateProfileRawForm) => {
           message: error.value.message,
           type: 'error',
         });
+        return;
       }
       uploadedProfilePicUrl = await uploadImg(profilePic.file);
     }
-    const profileData: IProfileUpdateDto = {};
+    const profileData: Partial<IProfileDto> = {};
     if (!profile.value) return; 
     if (!user.value) return; 
     Object.keys(form).forEach((key) => {
-      if (key === 'profilePictureUrl') {
-        !!profilePic && uploadedProfilePicUrl && (profileData[key] = uploadedProfilePicUrl);
+      if (key === 'profile_picture') {
+        !!profilePic && uploadedProfilePicUrl && (profileData["profilePictureUrl"] = uploadedProfilePicUrl);
       } else if (key === 'hobbies') {
         const hobbiesArray = form[key].split(',').map((hobby: string) => hobby.trim()).filter(Boolean);
         const allIncluded = profile.value && hobbiesArray.every((hobby: string) => profile.value && profile.value[key].includes(hobby));
@@ -68,8 +74,8 @@ const handleProfileEdit = async (form: CreateProfileRawForm) => {
           profileData[key] = new Date(form[key]).toISOString();
         }
       } else {
-        if (profile.value && profile.value[(key as keyof IProfileUpdateDto)] && (form[(key as keyof CreateProfileRawForm)] !== profile.value[(key as keyof IProfileUpdateDto)])) {
-          profileData[(key as keyof IProfileUpdateDto)] = form[(key as keyof CreateProfileRawForm)] as (string & string[]) | undefined;
+        if (profile.value && profile.value[(key as keyof IFullProfile)] && (form[(key as keyof CreateProfileRawForm)] !== profile.value[(key as keyof IFullProfile)])) {
+          profileData[(key as keyof IProfileDto)] = form[(key as keyof CreateProfileRawForm)] as (string & string[]) | undefined;
         }
       }
     });
@@ -151,7 +157,7 @@ const fileSelected = (event: any) => {
               :validation-rules="{
                 acceptedImgFormat
               }"
-              :validation-messages="{
+              :IProfileUpdateDtovalidation-messages="{
                 acceptedImgFormat: 'Image must be a .jpg, .jpeg, or .png file'
               }"/>
             </div>
@@ -162,7 +168,7 @@ const fileSelected = (event: any) => {
             </div>
           </div>
 
-          <FormKit type="tel" name="phone_number" label="Phone Number" required
+          <FormKit type="tel" name="phoneNumber" label="Phone Number" required
             placeholder="ex. 2348012345678" minlength="13" :value="profile?.phoneNumber"
             :classes="{
               label: 'text-oba-black text-base font-roboto font-light',
@@ -196,7 +202,7 @@ const fileSelected = (event: any) => {
             }" 
             :validation="[['required'], ['date_before', '1996-01-01']]"/>
 
-          <FormKit type="select" name="marital_status" label="Marital Status" :value="profile?.maritalStatus"
+          <FormKit type="select" name="maritalStatus" label="Marital Status" :value="profile?.maritalStatus"
             :options="[ 'Single', 'Married', 'Divorced', 'Widowed' ]"
             :classes="{
               label: 'text-oba-black text-base font-roboto font-light',
@@ -207,7 +213,7 @@ const fileSelected = (event: any) => {
             }" 
             :validation="[['required']]"/>
 
-          <FormKit type="select" name="occupation_status" label="Occupation Status" :value="profile?.occupationStatus"
+          <FormKit type="select" name="occupationStatus" label="Occupation Status" :value="profile?.occupationStatus"
             :options="[ 'Unemployed', 'Employed', 'Self-Employed' ]"
             :classes="{
               label: 'text-oba-black text-base font-roboto font-light',
@@ -228,7 +234,7 @@ const fileSelected = (event: any) => {
             }" 
             :validation="[['length', 3]]" />
 
-          <FormKit type="text" name="place_of_work" label="Place of Work" :value="profile?.placeOfWork"
+          <FormKit type="text" name="placeOfWork" label="Place of Work" :value="profile?.placeOfWork"
             placeholder="ex. Niger Delta Power Holding Co."
             :classes="{
               label: 'text-oba-black text-base font-roboto font-light',
@@ -239,7 +245,7 @@ const fileSelected = (event: any) => {
             }" 
             :validation="[['length', 5]]" />
 
-          <FormKit type="text" name="place_of_residence" label="Place of Residence"
+          <FormKit type="text" name="placeOfResidence" label="Place of Residence"
             placeholder="ex. Yenagoa" :value="profile?.placeOfResidence"
             :classes="{
               label: 'text-oba-black text-base font-roboto font-light',

@@ -36,7 +36,9 @@ export interface IProfileDto {
   profilePictureUrl: string;
 }
 
-export interface IProfileUpdateDto extends Partial<IProfileDto>{}
+export interface IProfileUpdateDto extends Partial<Omit<IProfileDto, 'profilePictureUrl'>>{
+  profile_picture?: string;
+}
 
 export interface IFullProfile extends IProfileDto {
   current_position: string;

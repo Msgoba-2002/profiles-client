@@ -3,7 +3,7 @@ import { fetchKeys } from "../types/enums";
 export const useImgUpload = () => {
   const uploadImg = async (file: File) => {
     const contentType = file.type;
-    const fileKey = 'dev/' +crypto.randomUUID();
+    const fileKey = 'dev/' + crypto.randomUUID();
     const { data, error } = await useApiFetch('/storage/upload-url', {
       method: 'POST',
       body: JSON.stringify({ contentType: contentType, key: fileKey }),
