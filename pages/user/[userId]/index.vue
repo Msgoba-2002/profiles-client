@@ -1,11 +1,28 @@
 <script setup lang="ts">
+import { fetchKeys } from '~/types/enums';
+
 definePageMeta({
   middleware: ['is-authenticated', 'is-verified', 'is-eligible', 'has-profile'],
   layout: 'profile-layout',
 });
 
-const { getRandomProfiles } = useProfileStore();
-const { profiles } = await getRandomProfiles(5);
+const count = 5;
+const { error } = await useApiFetch('/profile/random', {
+      method: 'GET',
+      key: fetchKeys.GetRandomProfiles,
+      query: { count: count },
+});
+
+if (error.value) {
+  const snackbar = useSnackbar();
+  snackbar.add({
+    title: 'Error Getting Profiles',
+    text: error.value.message,
+    type: 'error',
+  });
+}
+
+const { data: profiles } = useNuxtData(fetchKeys.GetRandomProfiles);
 </script>
 
 

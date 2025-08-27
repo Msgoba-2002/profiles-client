@@ -10,6 +10,7 @@ export const fetchKeys = {
   UploadUrl: 'UploadUrl',
   StoreProfile: 'StoreProfile',
   GetUserProfile: 'GetUserProfile',
+  GetMyProfile: 'GetMyProfile',
   UpdateProfile: 'UpdateProfile',
   DeleteImage: 'DeleteImage',
   GetQuestions: 'GetQuestions',

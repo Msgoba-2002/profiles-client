@@ -9,7 +9,7 @@ export interface AuthenticatedUser {
   questions_verified: boolean;
   is_admin: boolean;
   is_super_admin: boolean;
-  Profile: IFullProfile;
+  Profile: IFullProfile | null;
 }
 
 export interface FirebaseAuthenticatedUser {
@@ -21,6 +21,7 @@ export interface FirebaseAuthenticatedUser {
   questionsVerified: boolean;
   isAdmin: boolean;
   isSuperAdmin: boolean;
+  Profile: IFullProfile | null;
 }
 
 export interface FetchedAuthenticatedUser {

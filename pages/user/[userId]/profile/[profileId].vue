@@ -1,35 +1,48 @@
 <script setup lang="ts">
+import { fetchKeys } from '~/types/enums';
+import { type ILimitedProfile } from '~/types/profile';
+
 const route = useRoute();
-const profileId = route.params.profileId as string;
+const profileId = (route.params as { userId: string, profileId: string }).profileId;
 
-const profileStore = useProfileStore();
-const { getUserProfile } = profileStore;
-const userProfile = await getUserProfile(profileId);
+const snackbar = useSnackbar();
+const { error } = await useApiFetch(`/profile/user/${profileId}`, {
+      method: 'GET',
+      key: fetchKeys.GetUserProfile,
+});
 
-const fullName = computed(() => `${userProfile.user.first_name} ${userProfile.user.last_name}`);
-const hasNickname = computed(() => !!userProfile.nickname
-  && userProfile.nickname.toLowerCase() !== 'nil'
-  && userProfile.nickname.toLowerCase() !== 'none'
-  && userProfile.nickname.toLowerCase() !== 'n/a'
+if (error.value) {
+  snackbar.add({
+    title: "Error fetching user profile",
+    message: error.value.message,
+    type: "error"
+  });
+}
+
+const { data: userProfile } = useNuxtData<ILimitedProfile>(fetchKeys.GetUserProfile);
+
+const hasNickname = computed(() => !!userProfile.value?.nickname
+  && userProfile.value?.nickname.toLowerCase() !== 'nil'
+  && userProfile.value?.nickname.toLowerCase() !== 'none'
+  && userProfile.value?.nickname.toLowerCase() !== 'n/a'
 );
 
 const profileInfo = computed(() => {
   const info = {
-    Nickname: userProfile.nickname,
-    'Left From': userProfile.final_class,
-    Email: userProfile.user.email,
-    Birthday: new Date(userProfile.birthday).toLocaleDateString('en-NG', {
+    Nickname: userProfile.value?.nickname,
+    'Left From': userProfile.value?.finalClass,
+    Birthday: new Date((userProfile.value?.birthday)!).toLocaleDateString('en-NG', {
       year: '2-digit',
       month: 'short',
       day: 'numeric',
     }).split(' ').slice(0, 2).join('/'),
-    'Marital Status': userProfile.marital_status,
-    'Based In': userProfile.place_of_residence,
-    'Employment Status': userProfile.occupation_status,
-    Occupation: userProfile.occupation,
-    Employer: userProfile.place_of_work,
-    Hobbies: userProfile.hobbies.join(', '),
-    Bio: userProfile.bio,
+    'Marital Status': userProfile.value?.maritalStatus,
+    'Based In': userProfile.value?.placeOfResidence,
+    'Employment Status': userProfile.value?.occupationStatus,
+    Occupation: userProfile.value?.occupation,
+    Employer: userProfile.value?.placeOfWork,
+    Hobbies: (userProfile.value?.hobbies)!.join(', '),
+    Bio: userProfile.value?.bio,
   };
 
   Object.keys(info).forEach((key) => {
@@ -50,11 +63,11 @@ const profileInfo = computed(() => {
   <section class="py-4">
     <div class="sm:w-[70%] w-full mx-auto bg-oba-red rounded-md">
       <div class="px-6 py-4">
-        <h1 class="font-roboto font-light text-lg text-oba-white capitalize">{{ fullName }}</h1>
+        <h1 class="font-roboto font-light text-lg text-oba-white capitalize">{{ userProfile?.fullName }}</h1>
       </div>
       
       <div class="rounded-b-md bg-oba-gray">
-        <img :src="userProfile.profile_picture" alt="profile image" class="w-full aspect-square">
+        <img :src="userProfile?.profilePictureUrl" alt="profile image" class="w-full aspect-square">
 
         <ul class="w-full list-none">
           <li class="px-4 py-2 text-oba-black h-fit" v-for="(info, key, index) in profileInfo" :key="key"

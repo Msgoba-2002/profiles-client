@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { classOptions, classLevelOptions, classArmOptions } from '@/constants/classes';
-import type { CreateProfileRawForm, IProfileUpdateDto } from '@/types/profile';
+import type { CreateProfileRawForm, IFullProfile, IProfileUpdateDto } from '@/types/profile';
 import { stringToArray, acceptedImgFormat } from '@/utils/validators';
+import { fetchKeys } from '~/types/enums';
 
 definePageMeta({
   middleware: ['is-authenticated', 'is-verified', 'is-eligible', 'has-profile'],
@@ -18,12 +19,14 @@ const profile = computed(() => {
   return user.value?.Profile;
 });
 
-const classValue = ref(user.value?.Profile.final_class.split('-')[1].trim()[0]);
-const classLevel = ref(user.value?.Profile.final_class.split('-')[0].trim());
-const classArm = ref(user.value?.Profile.final_class.split('-')[1].trim()[1]);
+const snackbar = useSnackbar();
+const userStore = useUserStore();
+
+const classValue = ref(user.value?.Profile?.finalClass.split('-')[1].trim()[0]);
+const classLevel = ref(user.value?.Profile?.finalClass.split('-')[0].trim());
+const classArm = ref(user.value?.Profile?.finalClass.split('-')[1].trim()[1]);
 
 const editingProfile = ref(false);
-const { deletePicture, updateProfile } = useProfileStore();
 const uploadImg = useImgUpload();
 
 const handleProfileEdit = async (form: CreateProfileRawForm) => {
@@ -31,16 +34,26 @@ const handleProfileEdit = async (form: CreateProfileRawForm) => {
   let uploadedProfilePicUrl = '';
   try {
     const profilePic = form.profile_picture[0];
-    if (profilePic && profile.value?.profile_picture) {
+    if (profilePic && profile.value?.profilePictureUrl) {
       // delete old picture from s3
-      await deletePicture(profile.value?.profile_picture);
+      const { error } = await useApiFetch(`/storage/delete?path=${profile.value.profilePictureUrl}`, {
+        method: 'DELETE',
+        key: fetchKeys.DeleteImage,
+      });
+      if (error.value) {
+        snackbar.add({
+          title: 'Error Deleting Old Profile Picture',
+          message: error.value.message,
+          type: 'error',
+        });
+      }
       uploadedProfilePicUrl = await uploadImg(profilePic.file);
     }
     const profileData: IProfileUpdateDto = {};
     if (!profile.value) return; 
     if (!user.value) return; 
     Object.keys(form).forEach((key) => {
-      if (key === 'profile_picture') {
+      if (key === 'profilePictureUrl') {
         !!profilePic && uploadedProfilePicUrl && (profileData[key] = uploadedProfilePicUrl);
       } else if (key === 'hobbies') {
         const hobbiesArray = form[key].split(',').map((hobby: string) => hobby.trim()).filter(Boolean);
@@ -61,13 +74,28 @@ const handleProfileEdit = async (form: CreateProfileRawForm) => {
       }
     });
     const finalClass = `${classLevel.value} - ${classValue.value}${classArm.value}`;
-    if(profile.value.final_class !== finalClass) {
-      profileData.final_class = finalClass;
+    if(profile.value.finalClass !== finalClass) {
+      profileData.finalClass = finalClass;
     }
-    await updateProfile(profileData, profile.value.id);
+
+    const { error } = await useApiFetch(`/profile/`, {
+      method: 'PATCH',
+      key: fetchKeys.UpdateProfile,
+      body: JSON.stringify(profileData),
+    });
+
+    if (error.value) {
+      snackbar.add({
+        title: 'Error Updating Profile',
+        message: error.value.message,
+        type: 'error',
+      });
+    }
+    const { data: updatedProfile } = useNuxtData(fetchKeys.UpdateProfile);
+    userStore.setProfile(updatedProfile.value as IFullProfile);
     editingProfile.value = false;
 
-    return navigateTo({name: 'user-userId', params: {userId: user.value.id}})
+    return navigateTo({ name: 'user-userId', params: { userId: user.value.id } });
   } catch (err) {
     console.error(err);
     editingProfile.value = false;
@@ -135,7 +163,7 @@ const fileSelected = (event: any) => {
           </div>
 
           <FormKit type="tel" name="phone_number" label="Phone Number" required
-            placeholder="ex. 2348012345678" minlength="13" :value="profile?.phone_number"
+            placeholder="ex. 2348012345678" minlength="13" :value="profile?.phoneNumber"
             :classes="{
               label: 'text-oba-black text-base font-roboto font-light',
               input: 'w-full bg-oba-white rounded-md p-2 placeholder:text-sm font-roboto',
@@ -168,7 +196,7 @@ const fileSelected = (event: any) => {
             }" 
             :validation="[['required'], ['date_before', '1996-01-01']]"/>
 
-          <FormKit type="select" name="marital_status" label="Marital Status" :value="profile?.marital_status"
+          <FormKit type="select" name="marital_status" label="Marital Status" :value="profile?.maritalStatus"
             :options="[ 'Single', 'Married', 'Divorced', 'Widowed' ]"
             :classes="{
               label: 'text-oba-black text-base font-roboto font-light',
@@ -179,7 +207,7 @@ const fileSelected = (event: any) => {
             }" 
             :validation="[['required']]"/>
 
-          <FormKit type="select" name="occupation_status" label="Occupation Status" :value="profile?.occupation_status"
+          <FormKit type="select" name="occupation_status" label="Occupation Status" :value="profile?.occupationStatus"
             :options="[ 'Unemployed', 'Employed', 'Self-Employed' ]"
             :classes="{
               label: 'text-oba-black text-base font-roboto font-light',
@@ -200,7 +228,7 @@ const fileSelected = (event: any) => {
             }" 
             :validation="[['length', 3]]" />
 
-          <FormKit type="text" name="place_of_work" label="Place of Work" :value="profile?.place_of_work"
+          <FormKit type="text" name="place_of_work" label="Place of Work" :value="profile?.placeOfWork"
             placeholder="ex. Niger Delta Power Holding Co."
             :classes="{
               label: 'text-oba-black text-base font-roboto font-light',
@@ -212,7 +240,7 @@ const fileSelected = (event: any) => {
             :validation="[['length', 5]]" />
 
           <FormKit type="text" name="place_of_residence" label="Place of Residence"
-            placeholder="ex. Yenagoa" :value="profile?.place_of_residence"
+            placeholder="ex. Yenagoa" :value="profile?.placeOfResidence"
             :classes="{
               label: 'text-oba-black text-base font-roboto font-light',
               input: 'w-full bg-oba-white rounded-md p-2 placeholder:text-sm font-roboto',

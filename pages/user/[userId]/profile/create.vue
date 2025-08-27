@@ -3,21 +3,21 @@ definePageMeta({
   middleware: ['is-authenticated', 'is-verified', 'is-eligible', 'mustnt-have-profile'],
 });
 
-import type { CreateProfileRawForm } from '@/types/profile';
+import type { CreateProfileRawForm, IFullProfile } from '@/types/profile';
 import { classLevelOptions, classOptions, classArmOptions } from '@/constants/classes';
 import { fetchKeys } from '@/types/enums';
 import type { IProtoProfile } from '@/types/protoProfile';
 import { acceptedImgFormat, stringToArray } from '@/utils/validators';
 
-const { storeProfile } = useProfileStore();
-const { fetchUser } = useAuthStore();
-const { user } = storeToRefs(useUserStore());
+const userStore = useUserStore();
+const { user } = storeToRefs(userStore);
 
 const classLevel = ref('JSS');
 const classValue = ref('1');
 const classArm = ref('A');
 
 const uploadImg = useImgUpload();
+const snackbar = useSnackbar();
 
 const submitProfileCreate = () => {
   submitForm('profile-create');
@@ -34,20 +34,35 @@ const handleProfileCreate = async (form: CreateProfileRawForm) => {
   creatingProfile.value = true;
   try {
     const profilePic = form.profile_picture[0];
+    debugger;
+
     const uploadedProfilePicUrl = await uploadImg(profilePic.file);
 
     const { hobbies, birthday, ...rest } = form;
     const hobbiesArray = hobbies.split(',').map((hobby) => hobby.trim()).filter(Boolean);
     const profileData = {
       ...rest,
-      profile_picture: uploadedProfilePicUrl,
-      final_class: `${classLevel.value} - ${classValue.value}${classArm.value}`,
+      profilePictureUrl: uploadedProfilePicUrl,
+      finalClass: `${classLevel.value} - ${classValue.value}${classArm.value}`,
       hobbies: hobbiesArray,
       birthday: new Date(birthday).toISOString(),
     };
 
-    await storeProfile(profileData);
-    await fetchUser(true);
+    const { data, error } = await useApiFetch('/profile/', {
+      method: 'POST',
+      body: JSON.stringify(profileData),
+      key: fetchKeys.StoreProfile,
+    });
+
+    if (error.value) {
+      snackbar.add({
+        type: 'error',
+        message: 'Failed to create profile',
+        title: 'Profile Creation Error'
+      });
+    }
+
+    userStore.setProfile(data.value as IFullProfile);
 
     creatingProfile.value = false;
 
@@ -120,7 +135,7 @@ const fileSelected = (event: any) => {
             </div>
           </div>
 
-          <FormKit type="tel" name="phone_number" label="Phone Number" required :value="protoProfile.phone_number"
+          <FormKit type="tel" name="phoneNumber" label="Phone Number" required :value="protoProfile?.phoneNumber"
             placeholder="ex. 2348012345678" minlength="13"
             :classes="{
               label: 'text-oba-black text-base font-roboto font-light',
@@ -131,7 +146,7 @@ const fileSelected = (event: any) => {
             }" 
             :validation="[['required'], ['length', 11]]"/>
 
-          <FormKit type="text" name="nickname" label="Nickname" :value="protoProfile.nickname"
+          <FormKit type="text" name="nickname" label="Nickname" :value="protoProfile?.nickname"
             placeholder="what did we call you in school?"
             :classes="{
               label: 'text-oba-black text-base font-roboto font-light',
@@ -142,7 +157,7 @@ const fileSelected = (event: any) => {
             }" 
             :validation="[['length', 3]]"/>
 
-          <FormKit type="date" name="birthday" label="Birthday" :value="protoProfile.date_of_birth"
+          <FormKit type="date" name="birthday" label="Birthday" :value="protoProfile?.dateOfBirth.split('T')[0]"
             help="choose your date of birth"
             :classes="{
               label: 'text-oba-black text-base font-roboto font-light',
@@ -154,7 +169,7 @@ const fileSelected = (event: any) => {
             }" 
             :validation="[['required'], ['date_before', '1996-01-01']]"/>
 
-          <FormKit type="select" name="marital_status" label="Marital Status"
+          <FormKit type="select" name="maritalStatus" label="Marital Status"
             :options="[ 'Single', 'Married', 'Divorced', 'Widowed' ]"
             :classes="{
               label: 'text-oba-black text-base font-roboto font-light',
@@ -165,7 +180,7 @@ const fileSelected = (event: any) => {
             }" 
             :validation="[['required']]"/>
 
-          <FormKit type="select" name="occupation_status" label="Occupation Status"
+          <FormKit type="select" name="occupationStatus" label="Occupation Status"
             :options="[ 'Unemployed', 'Employed', 'Self-Employed' ]"
             :classes="{
               label: 'text-oba-black text-base font-roboto font-light',
@@ -186,7 +201,7 @@ const fileSelected = (event: any) => {
             }" 
             :validation="[['length', 3]]" />
 
-          <FormKit type="text" name="place_of_work" label="Place of Work"
+          <FormKit type="text" name="placeOfWork" label="Place of Work"
             placeholder="ex. Niger Delta Power Holding Co."
             :classes="{
               label: 'text-oba-black text-base font-roboto font-light',
@@ -197,7 +212,7 @@ const fileSelected = (event: any) => {
             }" 
             :validation="[['length', 5]]" />
 
-          <FormKit type="text" name="place_of_residence" label="Place of Residence"
+          <FormKit type="text" name="placeOfResidence" label="Place of Residence"
             placeholder="ex. Yenagoa"
             :classes="{
               label: 'text-oba-black text-base font-roboto font-light',
