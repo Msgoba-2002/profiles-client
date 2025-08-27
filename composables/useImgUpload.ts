@@ -5,7 +5,7 @@ export const useImgUpload = () => {
     const config = useRuntimeConfig();
     const contentType = file.type;
     ;
-    const fileKey = config.public.awsImgsFolder + crypto.randomUUID();
+    const fileKey = config.public.awsImgsFolder + '/' + crypto.randomUUID();
     const { data, error } = await useApiFetch('/storage/upload-url', {
       method: 'POST',
       body: JSON.stringify({ contentType: contentType, key: fileKey }),
