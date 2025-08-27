@@ -33,6 +33,7 @@ export default defineNuxtConfig({
       firebaseAuthDomain: '',
       firebaseProjectId: '',
       firebaseAppId: '',
+      awsImgsFolder: '',
     }
   },
   experimental: {
