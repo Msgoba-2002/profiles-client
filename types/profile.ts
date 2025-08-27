@@ -9,34 +9,36 @@ export interface IUploadedFile {
 
 export interface CreateProfileRawForm {
   profile_picture: IUploadedFile[];
-  phone_number: string;
+  phoneNumber: string;
   nickname?: string;
   birthday: Date;
-  marital_status: string;
-  occupation_status: string;
+  maritalStatus: string;
+  occupationStatus: string;
   occupation: string;
-  place_of_work: string;
-  place_of_residence: string;
+  placeOfWork: string;
+  placeOfResidence: string;
   hobbies: string;
   bio: string;
 }
 
 export interface IProfileDto {
-  profile_picture: string;
-  phone_number: string;
-  nickname?: string;
-  birthday: string;
-  marital_status: string;
-  occupation_status: string;
+  phoneNumber: string;
+  occupationStatus: string;
   occupation: string;
-  place_of_work: string;
-  place_of_residence: string;
+  placeOfWork: string;
+  placeOfResidence: string;
   hobbies: string[];
+  birthday: string;
+  maritalStatus: string;
+  nickname?: string;
+  finalClass: string;
   bio: string;
-  final_class: string;
+  profilePictureUrl: string;
 }
 
-export interface IProfileUpdateDto extends Partial<IProfileDto>{}
+export interface IProfileUpdateDto extends Partial<Omit<IProfileDto, 'profilePictureUrl'>>{
+  profile_picture?: string;
+}
 
 export interface IFullProfile extends IProfileDto {
   current_position: string;
@@ -46,32 +48,24 @@ export interface IFullProfile extends IProfileDto {
 
 export interface IRandomProfile {
   id: string;
-  first_name: string;
-  last_name: string;
-  Profile: {
-    id: string;
-    profile_picture: string;
-    nickname?: string;
-  }
+  fullName: string;
+  profilePictureUrl: string;
+  nickname?: string;
 }
 
 export interface ILimitedProfile {
-  user: {
-    id: string;
-    email: string;
-    first_name: string;
-    last_name: string;
-  }
   id: string;
-  bio: string;
-  birthday: string;
-  final_class: string;
-  hobbies: string[];
-  marital_status: string;
-  nickname?: string;
+  fullName: string;
+  userId: string;
+  occupationStatus: string;
   occupation?: string;
-  occupation_status: string;
-  place_of_work?: string;
-  place_of_residence: string;
-  profile_picture: string;
+  placeOfWork?: string;
+  placeOfResidence?: string;
+  hobbies?: string[];
+  birthday?: string;
+  maritalStatus?: string;
+  nickname?: string;
+  finalClass?: string;
+  bio?: string;
+  profilePictureUrl: string;
 }

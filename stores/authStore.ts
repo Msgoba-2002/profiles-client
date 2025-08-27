@@ -33,16 +33,20 @@ export const useAuthStore = defineStore('auth', () => {
       const result = await checkQuestionsVerified(accessToken.token);
       const { success: questionsVerified } = result as { message: string; success: boolean; };
 
+      let userProfile = null;
+      const { profile, success: profileSuccess, status } = await getMyProfile(accessToken.token);
+      if (profileSuccess) {
+        userProfile = profile;
+      } 
+
       userStore.setUser({
         ...currentUser,
         questionsVerified,
         isAdmin: accessToken.claims.admin || false,
-        isSuperAdmin: accessToken.claims.superAdmin || false
+        isSuperAdmin: accessToken.claims.superAdmin || false,
+        Profile: userProfile
       });
       userStore.setAccessToken(accessToken.token);
-      // Fetch user profile and attach to user object
-      // If no profile found, redirect to profile creation page
-      // 
       updateAuthState(true);
     }
   }
@@ -159,6 +163,26 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     return data.value;
+  }
+
+  const getMyProfile = async (token: string) => {
+    const {data, error } = await useApiFetch(`/profile/`, {
+        method: 'GET',
+      key: fetchKeys.GetMyProfile,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      if (error.value) {
+        if (error.value.statusCode === 404) {
+          return { profile: null, success: false, status: 404 };
+        } else {
+          return { profile: null, success: false, status: error.value.statusCode };
+        }
+      }
+
+      return { profile: data.value, success: true, status: 200 };
   }
 
   return {
