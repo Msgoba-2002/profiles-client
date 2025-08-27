@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { fetchKeys } from '@/types/enums';
 import type { EligibilityAnswer, EligibilityResponse } from '@/types/eligibility';
+import type { IQuestion } from '~/types/question';
 
 definePageMeta({
   middleware: ['is-authenticated', 'is-verified', 'mustnt-have-verified-questions'],
@@ -14,18 +15,32 @@ const submitEligibilityCheck = () => {
 
 
 const snackbar = useSnackbar();
-const { fetchQuestions } = useQuestionsStore();
-await fetchQuestions();
-const { questions } = storeToRefs(useQuestionsStore());
+
+const { error } = await useApiFetch('/question/', {
+  method: 'GET',
+  key: fetchKeys.GetQuestions,
+});
+
+if (error.value) {
+  snackbar.add({
+    title: 'Error',
+    text: error.value.message,
+    type: 'error',
+  });
+}
+
+const { data: questions } = useNuxtData<IQuestion[]>(fetchKeys.GetQuestions);
+
 const { user } = storeToRefs(useUserStore());
 const { fetchUser } = useAuthStore();
 
 const isChecking = ref(false);
 const handleEligibilityCheck = async (form: Record<string, string>) => {
+  if (!questions.value) return;
   isChecking.value = true;
   const dto: EligibilityAnswer[] = [];
   Object.keys(form).forEach((key) => {
-    const relevantQuestion = questions.value.find((question) => question.id === key);
+    const relevantQuestion = questions.value?.find((question) => question.id === key);
     const answer = relevantQuestion?.options.findIndex((option) => option === form[key]);
     dto.push({ questionId: key, providedAnswer: answer as number });
   });

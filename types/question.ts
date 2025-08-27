@@ -22,7 +22,3 @@ export interface IQuestion {
   options: string[];
   correctOption?: number;
 }
-
-export interface QuestionCreateResponse extends IQuestion {
-  correctOption: number;
-}
