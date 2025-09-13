@@ -10,15 +10,19 @@ export const fetchKeys = {
   UploadUrl: 'UploadUrl',
   StoreProfile: 'StoreProfile',
   GetUserProfile: 'GetUserProfile',
+  GetMyProfile: 'GetMyProfile',
   UpdateProfile: 'UpdateProfile',
   DeleteImage: 'DeleteImage',
   GetQuestions: 'GetQuestions',
+  AdminGetQuestions: 'AdminGetQuestions',
+  AdminGetQuestion: 'AdminGetQuestion',
   AddQuestion: 'AddQuestion',
   UpdateQuestion: 'UpdateQuestion',
   DeleteQuestion: 'DeleteQuestion',
   CheckEligibility: 'CheckEligibility',
   GetProtoProfile: 'GetProtoProfile',
   GetRandomProfiles: 'GetRandomProfiles',
+  GetQuestionsVerified: 'GetQuestionsVerified',
 } as const;
 
 export type FetchKeys = keyof typeof fetchKeys;

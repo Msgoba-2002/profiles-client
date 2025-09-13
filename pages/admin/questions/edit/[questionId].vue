@@ -3,7 +3,8 @@ definePageMeta({
   middleware: ['is-authenticated', 'is-verified', 'has-profile', 'is-admin'],
 });
 
-import type { UpdateQuestionForm } from '@/types/question';
+import { type IQuestion, type UpdateQuestionForm } from '@/types/question';
+import { fetchKeys } from '~/types/enums';
 
 const answerOptions = [
   { value: 0, label: 'A' },
@@ -11,15 +12,31 @@ const answerOptions = [
   { value: 2, label: 'C' },
 ];
 
-const { updateQuestion, fetchQuestions } = useQuestionsStore();
-await fetchQuestions();
+const snackbar = useSnackbar();
 
 const savingQuestion = ref(false);
 const route = useRoute();
 const qId = (route.params as { questionId: string; }).questionId;
-const { questions } = storeToRefs(useQuestionsStore());
+const { data: questions } = useNuxtData<IQuestion[]>(fetchKeys.AdminGetQuestions);
+if (!questions.value) {
+  const { error } = await useApiFetch(`/question/admin?id=${qId}`, {
+    method: 'GET',
+    key: fetchKeys.AdminGetQuestion,
+  });
+
+  if (error.value) {
+    snackbar.add({
+      title: 'Error',
+      text: error.value.message,
+      type: 'error',
+    });
+  }
+}
+
+const { data: questionData} = useNuxtData<IQuestion>(fetchKeys.AdminGetQuestion);
 const question = computed(() => {
-  return questions.value.find(q => q.id === qId);
+  if(!questions.value) return questionData.value;
+  return questions.value?.find(q => q.id === qId);
 });
 
 const handleUpdateQuestion = async (form: UpdateQuestionForm) => {
@@ -27,11 +44,26 @@ const handleUpdateQuestion = async (form: UpdateQuestionForm) => {
   const dto = {
     question: form.question,
     options: [form.option_a, form.option_b, form.option_c],
-    correct_option: form.correct_answer,
+    correctOption: form.correct_answer,
   }
 
-  await updateQuestion(dto, qId);
+  const { error } = await useApiFetch(`/question/${qId}`, {
+    method: 'PATCH',
+    key: fetchKeys.UpdateQuestion,
+    body: JSON.stringify(dto),
+  });
+  if (error.value) {
+    snackbar.add({
+      title: 'Error',
+      text: error.value.message,
+      type: 'error',
+    });
+    savingQuestion.value = false;
+    return;
+  }
   savingQuestion.value = false;
+  refreshNuxtData(fetchKeys.AdminGetQuestions);
+  navigateTo({ name: 'admin-questions' });
 }
 
 const submitQuestionEdit = () => {

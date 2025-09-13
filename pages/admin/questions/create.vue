@@ -4,6 +4,7 @@ definePageMeta({
 });
 
 import type { CreateQuestionForm } from '@/types/question';
+import { fetchKeys } from '~/types/enums';
 
 const answerOptions = [
   { value: 0, label: 'A' },
@@ -11,17 +12,32 @@ const answerOptions = [
   { value: 2, label: 'C' },
 ];
 
+const snackbar = useSnackbar();
+
 const savingQuestion = ref(false);
-const { addQuestion } = useQuestionsStore();
 const handleCreateQuestion = async (form: CreateQuestionForm) => {
   savingQuestion.value = true;
   const dto = {
     question: form.question,
     options: [form.option_a, form.option_b, form.option_c],
-    correct_option: form.correct_answer,
+    correctOption: form.correct_answer,
   }
 
-  await addQuestion(dto);
+  const { error } = await useApiFetch('/question/', {
+    method: 'POST',
+    key: fetchKeys.AddQuestion,
+    body: JSON.stringify(dto),
+  });
+
+  if (error.value) {
+    snackbar.add({
+      title: 'Error',
+      text: error.value.message,
+      type: 'error',
+    });
+    return;
+  }
+  refreshNuxtData(fetchKeys.AdminGetQuestions);
   savingQuestion.value = false;
   navigateTo({ name: 'admin-questions' });
 }

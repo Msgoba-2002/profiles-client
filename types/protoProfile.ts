@@ -1,7 +1,7 @@
 export interface IProtoProfile {
   id: string;
-  date_of_birth: string;
-  phone_number: string;
+  dateOfBirth: string;
+  phoneNumber: string;
   email: string;
   nickname: string;
 }

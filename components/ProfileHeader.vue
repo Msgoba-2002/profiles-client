@@ -12,7 +12,7 @@ const showEditProfile = computed(() => {
   <section class="my-8">
     <div class="sm:w-[70%] w-full mx-auto flex flex-row gap-4 sm:px-0 px-6">
       <div class="w-[20%]">
-        <img :src="user?.Profile.profile_picture" class="w-20 object-cover aspect-square rounded-full" />
+        <img :src="user?.Profile?.profilePictureUrl" class="w-20 object-cover aspect-square rounded-full" />
       </div>
 
       <div class="flex flex-col gap-2 justify-end items-start w-[80%]">

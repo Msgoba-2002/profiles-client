@@ -10,6 +10,7 @@ type FetchOptions = {
 
 export const useApiFetch = async (url: string, options: FetchOptions) => {
   const config = useRuntimeConfig();
+  const { accessToken } = storeToRefs(useUserStore());
   const { backendUrl, apiDockerUrl } = config.public;
 
   let baseUrl = backendUrl;
@@ -19,6 +20,7 @@ export const useApiFetch = async (url: string, options: FetchOptions) => {
     options.headers = {
       ...options.headers,
       ...useRequestHeaders(['cookie']),
+      Authorization: options.headers?.Authorization || `Bearer ${accessToken.value}`,
     }
   }
 
@@ -29,6 +31,7 @@ export const useApiFetch = async (url: string, options: FetchOptions) => {
     headers: {
       'Accept': 'application/json',
       ...options.headers,
+      Authorization: options.headers?.Authorization || `Bearer ${accessToken.value}`,
     }
   });
 }

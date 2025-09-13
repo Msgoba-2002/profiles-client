@@ -1,144 +1,200 @@
 import { fetchKeys } from "@/types/enums";
-import type { AuthenticatedUser, FetchedAuthenticatedUser, NewlyRegisteredUser, UserRegistrationForm } from "../types/user";
+import type { UserRegistrationForm } from "../types/user";
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import { useUserStore } from './userStore';
 import { useApiFetch } from "@/composables/useApiFetch";
-import type { EmailVerificationResponse } from "../types/verification";
-import type { PwResetDto, PwUpdateResponse } from "../types/password";
+import {
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+  sendEmailVerification,
+  browserLocalPersistence,
+  type User,
+  sendPasswordResetEmail,
+  deleteUser,
+} from "firebase/auth";
 
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref(false);
 
-  const fetchUser = async (refresh = false) => {
-    const userStore = useUserStore();
-    refresh && userStore.userRefresh();
-    const { data, error } = await useApiFetch('/auth/user', {
-      method: 'GET',
-      key: fetchKeys.GetUser,
-    });
-    if (error.value) {
-      console.log(error.value.message);
-      return;
+  const auth = useFirebaseAuth();
+  const userStore = useUserStore();
+  auth?.setPersistence(browserLocalPersistence);
+  
+  const fetchUser = async () => {
+    const currentUser = await getCurrentUser();
+    if (currentUser) {
+      const accessToken = await currentUser.getIdTokenResult();
+      // Check if user has passed the questions
+      const result = await checkQuestionsVerified(accessToken.token);
+      const { success: questionsVerified } = result as { message: string; success: boolean; };
+
+      let userProfile = null;
+      const { profile, success: profileSuccess, status } = await getMyProfile(accessToken.token);
+      if (profileSuccess) {
+        userProfile = profile;
+      } 
+
+      userStore.setUser({
+        ...currentUser,
+        questionsVerified,
+        isAdmin: accessToken.claims.admin || false,
+        isSuperAdmin: accessToken.claims.superAdmin || false,
+        Profile: userProfile
+      });
+      userStore.setAccessToken(accessToken.token);
+      updateAuthState(true);
     }
-    userStore.setUser((data.value as FetchedAuthenticatedUser).user);
-    updateAuthState(true);
   }
 
   const updateAuthState = (state: boolean) => {
     isAuthenticated.value = state;
   }
 
-  const emailLogin = async (email: string, password: string) => {
-    const { error } = await useApiFetch('/auth/login', {
-      method: 'POST',
-      key: fetchKeys.Login,
-      body: JSON.stringify({ email, password }),
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    });
-    if (!error.value) {
+  const emailRegistration = async (form: UserRegistrationForm) => {
+    const displayName = `${form.first_name} ${form.last_name}`.trim();
+    try {
+      const result = await createUserWithEmailAndPassword(auth!, form.email, form.password);
+      const user = result.user;
+      await updateProfile(user, {
+        displayName
+      });
+      const accessToken = await user.getIdTokenResult(true);
+      userStore.setAccessToken(accessToken.token || '');
       await fetchUser();
+      await sendVerificationEmail(user);
+      return { success: true, error: null };
+    } catch (error) {
+      console.error('Error during email registration:', error);
+      return { success: false, error: 'Email registration failed' };
     }
-    return error.value;
   }
-  
-  const googleLogin = () => {
-    const { backendUrl } = useRuntimeConfig().public;
-    return navigateTo(`${backendUrl}/auth/google`, { external: true });
+
+  const googleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    provider.addScope('email');
+    try {
+      const result = await signInWithPopup(auth!, provider);
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const token = credential?.accessToken;
+      userStore.setAccessToken(token || '');
+      await fetchUser();
+      return { success: true, error: null };
+    } catch (error) {
+      console.error('Error during Google sign-in:', error);
+      return { success: false, error: 'Google sign-in failed' };
+    }
+  }
+
+
+  const emailLogin = async (email: string, password: string) => {
+    try {
+      const result = await signInWithEmailAndPassword(auth!, email, password);
+      const user = result.user;
+      const accessToken = await user.getIdTokenResult(true);
+      userStore.setAccessToken(accessToken.token || '');
+      await fetchUser();
+      return { success: true, error: null };
+    } catch (error) {
+      console.error('Error during email login:', error);
+      return { success: false, error: 'Email login failed' };
+    }
   }
 
   const logout = async () => {
-    const { error } = await useApiFetch('/auth/logout', {
-      method: 'POST',
-      key: fetchKeys.Logout,
-    });
-    if (error.value) {
-      throw new Error(error.value.message);
-    }
-    const userStore = useUserStore();
-    updateAuthState(false);
-    userStore.setUser(null);
-  }
-
-  const registerUser = async (credentials: UserRegistrationForm) => {
-    const { data, error } = await useApiFetch('/auth/register', {
-      method: 'POST',
-      key: fetchKeys.Register,
-      body: JSON.stringify(credentials)
-    });
-
-    if (error.value) {
-      throw new Error(error.value.message);
-    }
-    const userStore = useUserStore();
-    const {created_at, ...user} = data.value as NewlyRegisteredUser;
-    userStore.setUser(user);
+    try {
+      await signOut(auth!);
+      updateAuthState(false);
+      userStore.setUser(null);
+  
+      return navigateTo({ name: 'login' });
+    } catch (error) {
+      console.error('Error during logout:', error);
+      return { success: false, error: 'Logout failed' };
+    };
   }
 
   const requestPwReset = async ({ email }: { email: string; }) => {
-    const { data, error } = await useApiFetch('/auth/forgot-password', {
-      method: 'POST',
-      key: fetchKeys.ForgotPassword,
-      body: JSON.stringify({ email }),
-    });
-
-    if (error.value) {
-      throw new Error(error.value.message);
+    try {
+      await sendPasswordResetEmail(auth!, email);
+      return { success: true, error: null };
+    } catch (error) {
+      console.error('Error during password reset request:', error);
+      return { success: false, error: 'Password reset request failed' };
     }
-
-    return data.value as EmailVerificationResponse;
   }
 
-  const resendVerificationEmail = async () => {
-    const { data, error } = await useApiFetch('/auth/send-verification', {
+  const sendVerificationEmail = async (user: User) => {
+    return await sendEmailVerification(user);
+  }
+
+  const deleteAccount = async () => {
+    const user = await getCurrentUser();
+    if (user) {
+      try {
+        await deleteUser(user);
+        return { success: true, error: null };
+      } catch (error: any) {
+        if (error.code === 'auth/requires-recent-login') {
+          // User needs to reauthenticate before deleting account
+          return { success: false, error: 'Please login again, then retry this action.' };
+        }
+        console.error('Error during account deletion:', error);
+        return { success: false, error: 'Account deletion failed' };
+      }
+    }
+  }
+
+  const checkQuestionsVerified = async (token: string) => {
+    const { data, error } = await useApiFetch('/question/verified', {
       method: 'GET',
-      key: fetchKeys.ResendVerification,
+      key: fetchKeys.GetQuestionsVerified,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     });
 
     if (error.value) {
       throw new Error(error.value.message);
     }
 
-    return data.value as EmailVerificationResponse;
+    return data.value;
   }
 
-  const verifyEmail = async (token: string) => {
-    const { data, error } = await useApiFetch('/auth/verify-email', {
-      method: 'PATCH',
-      key: fetchKeys.VerifyEmail,
-      body: JSON.stringify({ token }),
-    });
+  const getMyProfile = async (token: string) => {
+    const {data, error } = await useApiFetch(`/profile/`, {
+        method: 'GET',
+      key: fetchKeys.GetMyProfile,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      if (error.value) {
+        if (error.value.statusCode === 404) {
+          return { profile: null, success: false, status: 404 };
+        } else {
+          return { profile: null, success: false, status: error.value.statusCode };
+        }
+      }
 
-    return {data: data.value as EmailVerificationResponse, error: error.value};
-  }
-
-  const updatePassword = async (payload: PwResetDto) => {
-    const { data, error } = await useApiFetch('/auth/update-password', {
-      method: 'PATCH',
-      key: fetchKeys.UpdatePassword,
-      body: JSON.stringify(payload),
-    });
-
-    if (error.value) {
-      throw new Error(error.value.message);
-    }
-
-    return data.value as PwUpdateResponse;
+      return { profile: data.value, success: true, status: 200 };
   }
 
   return {
     fetchUser,
     updateAuthState,
+    emailRegistration,
     emailLogin,
     googleLogin,
     isAuthenticated,
     logout,
-    registerUser,
     requestPwReset,
-    resendVerificationEmail,
-    verifyEmail,
-    updatePassword,
+    sendVerificationEmail,
+    deleteAccount,
   }
 });
