@@ -69,7 +69,7 @@ const profileInfo = computed(() => {
       <div class="rounded-b-md bg-oba-gray">
         <img :src="userProfile?.profilePictureUrl" alt="profile image" class="w-full aspect-square">
 
-        <ul class="w-full list-none">
+        <ul class="w-full list-none pb-8">
           <li class="px-4 py-2 text-oba-black h-fit" v-for="(info, key, index) in profileInfo" :key="key"
             :class="index % 2 > 0 ? 'bg-oba-blue text-oba-white': ''">
             <div class="h-full">
